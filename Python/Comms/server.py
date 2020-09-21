@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 import socket
 
 
@@ -17,5 +15,5 @@ while 1:
     data = conn.recv(BUFFER_SIZE)
     if not data: break
     print("received data:", data)
-    conn.send(data)  # echo
+    conn.send(data + b' egil')  # echo
 conn.close()
