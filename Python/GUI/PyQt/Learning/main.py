@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction, QApplication, QCheckBox, QLabel, QPushButton,QMainWindow, QStatusBar, QToolBar
+from PyQt5.QtWidgets import QAction, QApplication, QCheckBox, QComboBox, QLabel, QLineEdit, QListWidget, QPushButton,QMainWindow, QStatusBar, QToolBar
 from PyQt5 import QtWidgets
 
 
@@ -10,43 +10,37 @@ class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         
-        self.setWindowTitle("My vilde App")
+        self.setWindowTitle("My Awesome App")
         
-        label = QLabel("THIS IS Vilde!!!")
-        label.setAlignment(Qt.AlignCenter)
+        widget = QLineEdit()
+        widget.setMaxLength(10)
+        widget.setPlaceholderText("Enter your text")
 
-        self.setCentralWidget(label)
+        #widget.setReadOnly(True) # uncomment this to make readonly
         
-        toolbar = QToolBar("My Vilde Toolbar")
-        self.addToolBar(toolbar)
+        widget.returnPressed.connect(self.return_pressed)
+        widget.selectionChanged.connect(self.selection_changed)
+        widget.textChanged.connect(self.text_changed)
+        widget.textEdited.connect(self.text_edited)
 
-        button_action = QAction(QIcon("./Python/resources/icons/icons/bug.png"),"Your button", self)
-        button_action.setStatusTip("This is your button")
-        button_action.triggered.connect(self.onMyToolBarButtonClick)
-        button_action.setCheckable(True)
-        toolbar.addAction(button_action)
+        self.setCentralWidget(widget)
         
-        toolbar.addSeparator()
         
-        button_action2 = QAction(QIcon("./Python/resources/icons/icons/bug.png"), "Your button2", self)
-        button_action2.setStatusTip("This is your second button")
-        button_action2.triggered.connect(self.onMyToolBarButtonClick)
-        button_action2.setCheckable(True)
-        toolbar.addAction(button_action2)
-        
-        toolbar.addSeparator()
-        
-        toolbar.addWidget(QLabel("Hello"))
-        
-        toolbar.addSeparator()
-        
-        toolbar.addWidget(QCheckBox())
-        
-        self.setStatusBar(QStatusBar(self))
+    def return_pressed(self):
+        print("Return pressed!")
+        self.centralWidget().setText("BOOM!")
 
-    def onMyToolBarButtonClick(self, s):
-        print("Click", s)
-
+    def selection_changed(self):
+        print("Selection changed")
+        print(self.centralWidget().selectedText())
+        
+    def text_changed(self, s):
+        print("Text changed...")
+        print(s)
+            
+    def text_edited(self, s):
+        print("Text edited...")
+        print(s)
 # You need one (and only one) QApplication instance per application.
 # Pass in sys.argv to allow command line arguments for your app.
 # If you know you won't use command line arguments QApplication([]) works too.
