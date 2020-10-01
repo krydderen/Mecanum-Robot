@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor, QIcon, QPalette
-from PyQt5.QtWidgets import QAction, QApplication, QBoxLayout, QCheckBox, QComboBox, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton,QMainWindow, QStatusBar, QToolBar, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QAction, QApplication, QBoxLayout, QCheckBox, QComboBox, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton,QMainWindow, QStackedLayout, QStatusBar, QTabWidget, QToolBar, QVBoxLayout, QWidget
 from PyQt5 import QtWidgets
 
 class Color(QWidget):
@@ -19,31 +19,18 @@ class MainWindow(QMainWindow):
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         
-        self.setWindowTitle("My Vilde App")
-        
-        layout1 = QHBoxLayout()
-        layout2 = QVBoxLayout()
-        layout3 = QVBoxLayout()
-        
-        layout1.setContentsMargins(0,0,0,0)
-        layout1.setSpacing(0)
-        
-        layout1.addWidget(Color('green'))
-        
-        layout2.addWidget(Color('red'))
-        layout2.addWidget(Color('yellow'))
-        layout2.addWidget(Color('purple'))
-        
-        layout1.addLayout(layout2)
-        
-        layout3.addWidget(Color('red'))
-        layout3.addWidget(Color('blue'))
-        
-        layout1.addLayout(layout3)
-        
-        widget = QWidget()
-        widget.setLayout(layout1)
-        self.setCentralWidget(widget)
+        self.setWindowTitle("My Awesome App")
+
+
+        tabs = QTabWidget()
+        tabs.setDocumentMode(True)
+        tabs.setTabPosition(QTabWidget.North)
+        tabs.setMovable(True)
+
+        for n, color in enumerate(['red','green','blue','yellow']):
+            tabs.addTab( Color(color), color)
+
+        self.setCentralWidget(tabs)
         
         
 # You need one (and only one) QApplication instance per application.
