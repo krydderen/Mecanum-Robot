@@ -1,93 +1,146 @@
-import sys
-from PyQt5.QtCore import QSize, Qt
-from PyQt5.QtGui import QColor, QIcon, QPalette
-from PyQt5.QtWidgets import QAction, QApplication, QBoxLayout, QCheckBox, QComboBox, QDialog, QDialogButtonBox, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton,QMainWindow, QStackedLayout, QStatusBar, QTabWidget, QToolBar, QVBoxLayout, QWidget
-from PyQt5 import QtWidgets
+from PyQt5.QtGui import *
+from PyQt5.QtWidgets import *
+from PyQt5.QtCore import *
 
-class Color(QWidget):
+import time
+import traceback, sys
 
-    def __init__(self, color, *args, **kwargs):
-        super(Color, self).__init__(*args, **kwargs)
-        self.setAutoFillBackground(True)
+
+class WorkerSignals(QObject):
+    '''
+    Defines the signals available from a running worker thread.
+
+    Supported signals are:
+
+    finished
+        No data
+    
+    error
+        `tuple` (exctype, value, traceback.format_exc() )
+    
+    result
+        `object` data returned from processing, anything
+
+    progress
+        `int` indicating % progress 
+
+    '''
+    finished = pyqtSignal()
+    error = pyqtSignal(tuple)
+    result = pyqtSignal(object)
+    progress = pyqtSignal(int)
+
+
+class Worker(QRunnable):
+    '''
+    Worker thread
+
+    Inherits from QRunnable to handler worker thread setup, signals and wrap-up.
+
+    :param callback: The function callback to run on this worker thread. Supplied args and 
+                     kwargs will be passed through to the runner.
+    :type callback: function
+    :param args: Arguments to pass to the callback function
+    :param kwargs: Keywords to pass to the callback function
+
+    '''
+
+    def __init__(self, fn, *args, **kwargs):
+        super(Worker, self).__init__()
+
+        # Store constructor arguments (re-used for processing)
+        self.fn = fn
+        self.args = args
+        self.kwargs = kwargs
+        self.signals = WorkerSignals()    
+
+        # Add the callback to our kwargs
+        self.kwargs['progress_callback'] = self.signals.progress        
+
+    @pyqtSlot()
+    def run(self):
+        '''
+        Initialise the runner function with passed args, kwargs.
+        '''
         
-        palette = self.palette()
-        palette.setColor(QPalette.Window, QColor(color))
-        self.setPalette(palette)
-
-class CustomDialog(QDialog):
-
-    def __init__(self, *args, **kwargs):
-        super(CustomDialog, self).__init__(*args, **kwargs)
+        # Retrieve args/kwargs here; and fire processing using them
+        try:
+            result = self.fn(*self.args, **self.kwargs)
+        except:
+            traceback.print_exc()
+            exctype, value = sys.exc_info()[:2]
+            self.signals.error.emit((exctype, value, traceback.format_exc()))
+        else:
+            self.signals.result.emit(result)  # Return the result of the processing
+        finally:
+            self.signals.finished.emit()  # Done
         
-        self.setWindowTitle("HELLO!")
-        
-        QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
-        
-        self.buttonBox = QDialogButtonBox(QBtn)
-        self.buttonBox.accepted.connect(self.accept)
-        self.buttonBox.rejected.connect(self.reject)
 
-        self.layout = QVBoxLayout()
-        self.layout.addWidget(self.buttonBox)
-        self.setLayout(self.layout)
 
 class MainWindow(QMainWindow):
 
+
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
+    
+        self.counter = 0
+    
+        layout = QVBoxLayout()
         
-        self.setWindowTitle("My Awesome App")
-        
-        label = QLabel("THIS IS AWESOME!!!")
-        label.setAlignment(Qt.AlignCenter)
-        
-        self.setCentralWidget(label)
-        
-        toolbar = QToolBar("My main toolbar")
-        toolbar.setIconSize(QSize(30,30))
-        self.addToolBar(toolbar)
-        
-        button_action = QAction(QIcon("./Python/resources/icons/icons/bug.png"), "Your button", self)
-        button_action.setStatusTip("This is your button")
-        button_action.triggered.connect(self.onMyToolBarButtonClick)
-        button_action.setCheckable(True)
-        toolbar.addAction(button_action)
-        
-        toolbar.addSeparator()
-        
-        button_action2 = QAction(QIcon("./Python/resources/icons/icons/bug.png"), "Your button2", self)
-        button_action2.setStatusTip("This is your button2")
-        button_action2.triggered.connect(self.onMyToolBarButtonClick)
-        button_action2.setCheckable(True)
-        toolbar.addAction(button_action2)
-        
-        toolbar.addWidget(QLabel("Hello"))
-        toolbar.addWidget(QCheckBox())
-        
-        self.setStatusBar(QStatusBar(self))
+        self.l = QLabel("Start")
+        b = QPushButton("DANGER!")
+        b.pressed.connect(self.oh_no)
+    
+        layout.addWidget(self.l)
+        layout.addWidget(b)
+    
+        w = QWidget()
+        w.setLayout(layout)
+    
+        self.setCentralWidget(w)
+    
+        self.show()
 
-    def onMyToolBarButtonClick(self, s):
-        print("click", s)
-        
-        
-        dlg = CustomDialog(self)
-        if dlg.exec_():
-            print("Success!")
-        else:
-            print("Cancel!")
-        
-        
-# You need one (and only one) QApplication instance per application.
-# Pass in sys.argv to allow command line arguments for your app.
-# If you know you won't use command line arguments QApplication([]) works too.
-app = QApplication(sys.argv)
+        self.threadpool = QThreadPool()
+        print("Multithreading with maximum %d threads" % self.threadpool.maxThreadCount())
 
+        self.timer = QTimer()
+        self.timer.setInterval(1000)
+        self.timer.timeout.connect(self.recurring_timer)
+        self.timer.start()
+    
+    def progress_fn(self, n):
+        print("%d%% done" % n)
+
+    def execute_this_fn(self, progress_callback):
+        for n in range(0, 5):
+            time.sleep(1)
+            progress_callback.emit(n*100/4)
+            
+        return "Done."
+ 
+    def print_output(self, s):
+        print(s)
+        
+    def thread_complete(self):
+        print("THREAD COMPLETE!")
+ 
+    def oh_no(self):
+        # Pass the function to execute
+        worker = Worker(self.execute_this_fn) # Any other args, kwargs are passed to the run function
+        worker.signals.result.connect(self.print_output)
+        worker.signals.finished.connect(self.thread_complete)
+        worker.signals.progress.connect(self.progress_fn)
+        
+        # Execute
+        self.threadpool.start(worker) 
+
+        
+    def recurring_timer(self):
+        self.counter +=1
+        self.l.setText("Counter: %d" % self.counter)
+    
+    
+app = QApplication([])
 window = MainWindow()
-window.show() # IMPORTANT!!!!! Windows are hidden by default.
-
-# Start the event loop.
 app.exec_()
-
-
-# Your application won't reach here until you exit and the event 
-# loop has stopped.
