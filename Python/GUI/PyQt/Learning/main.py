@@ -1,5 +1,6 @@
 import sys
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import QAction, QApplication, QLabel, QPushButton,QMainWindow, QStatusBar, QToolBar
 from PyQt5 import QtWidgets
 
@@ -19,7 +20,7 @@ class MainWindow(QMainWindow):
         toolbar = QToolBar("My Vilde Toolbar")
         self.addToolBar(toolbar)
 
-        button_action = QAction("Your button", self)
+        button_action = QAction(QIcon("./Python/resources/icons/icons/bug.png"),"Your button", self)
         button_action.setStatusTip("This is your button")
         button_action.triggered.connect(self.onMyToolBarButtonClick)
         button_action.setCheckable(True)
