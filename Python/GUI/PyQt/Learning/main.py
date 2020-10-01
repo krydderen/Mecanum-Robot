@@ -1,46 +1,51 @@
 import sys
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QAction, QApplication, QCheckBox, QComboBox, QLabel, QLineEdit, QListWidget, QPushButton,QMainWindow, QStatusBar, QToolBar
+from PyQt5.QtGui import QColor, QIcon, QPalette
+from PyQt5.QtWidgets import QAction, QApplication, QBoxLayout, QCheckBox, QComboBox, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton,QMainWindow, QStatusBar, QToolBar, QVBoxLayout, QWidget
 from PyQt5 import QtWidgets
 
+class Color(QWidget):
+
+    def __init__(self, color, *args, **kwargs):
+        super(Color, self).__init__(*args, **kwargs)
+        self.setAutoFillBackground(True)
+        
+        palette = self.palette()
+        palette.setColor(QPalette.Window, QColor(color))
+        self.setPalette(palette)
 
 class MainWindow(QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         
-        self.setWindowTitle("My Awesome App")
+        self.setWindowTitle("My Vilde App")
         
-        widget = QLineEdit()
-        widget.setMaxLength(10)
-        widget.setPlaceholderText("Enter your text")
-
-        #widget.setReadOnly(True) # uncomment this to make readonly
+        layout1 = QHBoxLayout()
+        layout2 = QVBoxLayout()
+        layout3 = QVBoxLayout()
         
-        widget.returnPressed.connect(self.return_pressed)
-        widget.selectionChanged.connect(self.selection_changed)
-        widget.textChanged.connect(self.text_changed)
-        widget.textEdited.connect(self.text_edited)
-
+        layout1.setContentsMargins(0,0,0,0)
+        layout1.setSpacing(0)
+        
+        layout1.addWidget(Color('green'))
+        
+        layout2.addWidget(Color('red'))
+        layout2.addWidget(Color('yellow'))
+        layout2.addWidget(Color('purple'))
+        
+        layout1.addLayout(layout2)
+        
+        layout3.addWidget(Color('red'))
+        layout3.addWidget(Color('blue'))
+        
+        layout1.addLayout(layout3)
+        
+        widget = QWidget()
+        widget.setLayout(layout1)
         self.setCentralWidget(widget)
         
         
-    def return_pressed(self):
-        print("Return pressed!")
-        self.centralWidget().setText("BOOM!")
-
-    def selection_changed(self):
-        print("Selection changed")
-        print(self.centralWidget().selectedText())
-        
-    def text_changed(self, s):
-        print("Text changed...")
-        print(s)
-            
-    def text_edited(self, s):
-        print("Text edited...")
-        print(s)
 # You need one (and only one) QApplication instance per application.
 # Pass in sys.argv to allow command line arguments for your app.
 # If you know you won't use command line arguments QApplication([]) works too.
