@@ -1,7 +1,7 @@
 import sys
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import QSize, Qt
 from PyQt5.QtGui import QColor, QIcon, QPalette
-from PyQt5.QtWidgets import QAction, QApplication, QBoxLayout, QCheckBox, QComboBox, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton,QMainWindow, QStackedLayout, QStatusBar, QTabWidget, QToolBar, QVBoxLayout, QWidget
+from PyQt5.QtWidgets import QAction, QApplication, QBoxLayout, QCheckBox, QComboBox, QDialog, QDialogButtonBox, QGridLayout, QHBoxLayout, QLabel, QLineEdit, QListWidget, QPushButton,QMainWindow, QStackedLayout, QStatusBar, QTabWidget, QToolBar, QVBoxLayout, QWidget
 from PyQt5 import QtWidgets
 
 class Color(QWidget):
@@ -14,23 +14,67 @@ class Color(QWidget):
         palette.setColor(QPalette.Window, QColor(color))
         self.setPalette(palette)
 
+class CustomDialog(QDialog):
+
+    def __init__(self, *args, **kwargs):
+        super(CustomDialog, self).__init__(*args, **kwargs)
+        
+        self.setWindowTitle("HELLO!")
+        
+        QBtn = QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+        
+        self.buttonBox = QDialogButtonBox(QBtn)
+        self.buttonBox.accepted.connect(self.accept)
+        self.buttonBox.rejected.connect(self.reject)
+
+        self.layout = QVBoxLayout()
+        self.layout.addWidget(self.buttonBox)
+        self.setLayout(self.layout)
+
 class MainWindow(QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         
         self.setWindowTitle("My Awesome App")
+        
+        label = QLabel("THIS IS AWESOME!!!")
+        label.setAlignment(Qt.AlignCenter)
+        
+        self.setCentralWidget(label)
+        
+        toolbar = QToolBar("My main toolbar")
+        toolbar.setIconSize(QSize(30,30))
+        self.addToolBar(toolbar)
+        
+        button_action = QAction(QIcon("./Python/resources/icons/icons/bug.png"), "Your button", self)
+        button_action.setStatusTip("This is your button")
+        button_action.triggered.connect(self.onMyToolBarButtonClick)
+        button_action.setCheckable(True)
+        toolbar.addAction(button_action)
+        
+        toolbar.addSeparator()
+        
+        button_action2 = QAction(QIcon("./Python/resources/icons/icons/bug.png"), "Your button2", self)
+        button_action2.setStatusTip("This is your button2")
+        button_action2.triggered.connect(self.onMyToolBarButtonClick)
+        button_action2.setCheckable(True)
+        toolbar.addAction(button_action2)
+        
+        toolbar.addWidget(QLabel("Hello"))
+        toolbar.addWidget(QCheckBox())
+        
+        self.setStatusBar(QStatusBar(self))
 
-
-        tabs = QTabWidget()
-        tabs.setDocumentMode(True)
-        tabs.setTabPosition(QTabWidget.North)
-        tabs.setMovable(True)
-
-        for n, color in enumerate(['red','green','blue','yellow']):
-            tabs.addTab( Color(color), color)
-
-        self.setCentralWidget(tabs)
+    def onMyToolBarButtonClick(self, s):
+        print("click", s)
+        
+        
+        dlg = CustomDialog(self)
+        if dlg.exec_():
+            print("Success!")
+        else:
+            print("Cancel!")
         
         
 # You need one (and only one) QApplication instance per application.
