@@ -1,4 +1,26 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+import sys
+from PyQt5.QtWidgets import  QWidget, QLabel, QApplication
+from PyQt5.QtCore import QThread, Qt, pyqtSignal, pyqtSlot
+from PyQt5.QtGui import QImage, QPixmap
+import cv2
+import cv2
+
+class Thread(QThread):
+    changePixmap = pyqtSignal(QImage)
+
+    def run(self):
+        cap = cv2.VideoCapture(0)
+        while True:
+            ret, frame = cap.read()
+            if ret:
+                # https://stackoverflow.com/a/55468544/6622587
+                rgbImage = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                h, w, ch = rgbImage.shape
+                bytesPerLine = ch * w
+                convertToQtFormat = QImage(rgbImage.data, w, h, bytesPerLine, QImage.Format_RGB888)
+                p = convertToQtFormat.scaled(640, 480, Qt.KeepAspectRatio)
+                self.changePixmap.emit(p)
 
 
 class Ui_MainWindow(object):
@@ -38,7 +60,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addItem(spacerItem)
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
         self.verticalLayout_2.setObjectName("verticalLayout_2")
-        self.opencvthinghere = QtWidgets.QGraphicsView(self.horizontalWidget)
+        self.opencvthinghere = QLabel(self.horizontalWidget)
         self.opencvthinghere.setObjectName("opencvthinghere")
         self.verticalLayout_2.addWidget(self.opencvthinghere)
         self.horizontalLayout.addLayout(self.verticalLayout_2)
@@ -50,13 +72,18 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
+        
+        
+    @pyqtSlot(QImage)
+    def setImage(self, image):
+        self.opencvthinghere.setPixmap(QPixmap.fromImage(image))
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.hellobutton.setText(_translate("MainWindow", "Hei"))
-        self.hellovildebutton.setText(_translate("MainWindow", "Vild├ª"))
-
+        self.hellovildebutton.setText(_translate("MainWindow", "Vilde"))
+        
 
 if __name__ == "__main__":
     import sys
@@ -64,5 +91,8 @@ if __name__ == "__main__":
     MainWindow = QtWidgets.QMainWindow()
     ui = Ui_MainWindow()
     ui.setupUi(MainWindow)
+    th = Thread(self)
+    th.changePixmap.connect(self.setImage)
+    th.start()
     MainWindow.show()
     sys.exit(app.exec_())
