@@ -3,13 +3,17 @@ from time import sleep
 import RPi.GPIO as GPIO
 
 global roboclaw
+global HALFFORWARD
+global HALFREVERSE
 global FULLFORWARD
 global FULLREVERSE
 global FULLSTOP
 
 FULLFORWARD = [127  , 255]
-FULLREVERSE = [1   , 128]
-FULLSTOP = 0
+FULLREVERSE = [1    , 128]
+FULLSTOP    = 0
+HALFFORWARD = [98   , 225]
+HALFREVERSE = [30   , 158]
 
 
 def run_controller(pin, speed):
@@ -22,20 +26,21 @@ def run_controller(pin, speed):
 def forward():
     global roboclaw
     global FULLFORWARD
+    global HALFFORWARD
     
     GPIO.output(23, GPIO.HIGH)
     #Forward 1
-    roboclaw.write(chr(FULLFORWARD[0]));
+    roboclaw.write(chr(HALFFORWARD[0]));
     #Forward 2
-    roboclaw.write(chr(FULLFORWARD[1]));
+    roboclaw.write(chr(HALFFORWARD[1]));
     sleep(0.001)
     GPIO.output(23, GPIO.LOW)
     
     GPIO.output(24, GPIO.HIGH)
     #Forward 1
-    roboclaw.write(chr(FULLFORWARD[0]));
+    roboclaw.write(chr(HALFFORWARD[0]));
     #Forward 2
-    roboclaw.write(chr(FULLFORWARD[1]));
+    roboclaw.write(chr(HALFFORWARD[1]));
     sleep(0.001)
     GPIO.output(24, GPIO.LOW)
     sleep(1)
@@ -43,20 +48,21 @@ def forward():
 def backward():
     global roboclaw
     global FULLREVERSE
+    global HALFREVERSE
     
     GPIO.output(23, GPIO.HIGH)
     #Backward 1
-    roboclaw.write(chr(FULLREVERSE[0]));
+    roboclaw.write(chr(HALFREVERSE[0]));
     #Backward 2
-    roboclaw.write(chr(FULLREVERSE[1]));
+    roboclaw.write(chr(HALFREVERSE[1]));
     sleep(0.001)
     GPIO.output(23, GPIO.LOW)
     
     GPIO.output(24, GPIO.HIGH)
     #Backward 1
-    roboclaw.write(chr(FULLREVERSE[0]));
+    roboclaw.write(chr(HALFREVERSE[0]));
     #Backward 2
-    roboclaw.write(chr(FULLREVERSE[1]));
+    roboclaw.write(chr(HALFREVERSE[1]));
     sleep(0.001)
     GPIO.output(24, GPIO.LOW)
     sleep(1)
