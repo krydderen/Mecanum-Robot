@@ -2,6 +2,16 @@ from serial import Serial
 from time import sleep
 import RPi.GPIO as GPIO
 
+global roboclaw
+global FULLFORWARD
+global FULLREVERSE
+global FULLSTOP
+
+FULLFORWARD = [127  , 255]
+FULLREVERSE = [63   , 191]
+FULLSTOP = 0
+
+
 def run_controller(pin, speed):
     
     GPIO.output(pin, GPIO.HIGH)
@@ -10,14 +20,47 @@ def run_controller(pin, speed):
     #sleep(run_time)
     
 def forward():
-    global slave_select_pins
-    #Controller 1 full backward
-    run_controller(slave_select_pins[0], 63)
-    run_controller(slave_select_pins[0], 191)
-    #Controller 2 full forward
-    run_controller(slave_select_pins[1], 1)
-    run_controller(slave_select_pins[1], 128)
+    global roboclaw
+    global FULLFORWARD
     
+    GPIO.output(23, GPIO.HIGH)
+    #Forward 1
+    roboclaw.write(chr(127));
+    #Forward 2
+    roboclaw.write(chr(255));
+    sleep(0.001)
+    GPIO.output(23, GPIO.LOW)
+    
+    GPIO.output(24, GPIO.HIGH)
+    #Forward 1
+    roboclaw.write(chr(127));
+    #Forward 2
+    roboclaw.write(chr(255));
+    sleep(0.001)
+    GPIO.output(24, GPIO.LOW)
+    sleep(1)
+    
+def backward():
+    global roboclaw
+    global FULLBACKWARD
+    
+    GPIO.output(23, GPIO.HIGH)
+    #Backward 1
+    roboclaw.write(chr(1));
+    #Backward 2
+    roboclaw.write(chr(128));
+    sleep(0.001)
+    GPIO.output(23, GPIO.LOW)
+    
+    GPIO.output(24, GPIO.HIGH)
+    #Backward 1
+    roboclaw.write(chr(1));;
+    #Backward 2
+    roboclaw.write(chr(128));
+    sleep(0.001)
+    GPIO.output(24, GPIO.LOW)
+    sleep(1)
+        
 def stop_controller(pin):
     GPIO.output(pin, GPIO.HIGH)
     roboclaw.write(chr(0));
@@ -50,7 +93,7 @@ if __name__ == "__main__":
     while(1):
         #GPIO.cleanup()
         
-        GPIO.output(23, GPIO.HIGH)
+        """ GPIO.output(23, GPIO.HIGH)
         #sleep(.2);
         #Forward 1
         roboclaw.write(chr(127));
@@ -77,7 +120,10 @@ if __name__ == "__main__":
         #GPIO.output(24, GPIO.LOW)
         sleep(0.001)
         GPIO.output(24, GPIO.LOW)
-        sleep(1)
+        sleep(1) """
+        
+        forward()
+        #backward()
         
         stop()
         sleep(2)
