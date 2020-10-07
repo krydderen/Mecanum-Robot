@@ -8,7 +8,7 @@ global FULLREVERSE
 global FULLSTOP
 
 FULLFORWARD = [127  , 255]
-FULLREVERSE = [63   , 191]
+FULLREVERSE = [1   , 128]
 FULLSTOP = 0
 
 
@@ -25,38 +25,38 @@ def forward():
     
     GPIO.output(23, GPIO.HIGH)
     #Forward 1
-    roboclaw.write(chr(127));
+    roboclaw.write(chr(FULLFORWARD[0]));
     #Forward 2
-    roboclaw.write(chr(255));
+    roboclaw.write(chr(FULLFORWARD[1]));
     sleep(0.001)
     GPIO.output(23, GPIO.LOW)
     
     GPIO.output(24, GPIO.HIGH)
     #Forward 1
-    roboclaw.write(chr(127));
+    roboclaw.write(chr(FULLFORWARD[0]));
     #Forward 2
-    roboclaw.write(chr(255));
+    roboclaw.write(chr(FULLFORWARD[1]));
     sleep(0.001)
     GPIO.output(24, GPIO.LOW)
     sleep(1)
     
 def backward():
     global roboclaw
-    global FULLBACKWARD
+    global FULLREVERSE
     
     GPIO.output(23, GPIO.HIGH)
     #Backward 1
-    roboclaw.write(chr(1));
+    roboclaw.write(chr(FULLREVERSE[0]));
     #Backward 2
-    roboclaw.write(chr(128));
+    roboclaw.write(chr(FULLREVERSE[1]));
     sleep(0.001)
     GPIO.output(23, GPIO.LOW)
     
     GPIO.output(24, GPIO.HIGH)
     #Backward 1
-    roboclaw.write(chr(1));;
+    roboclaw.write(chr(FULLREVERSE[0]));
     #Backward 2
-    roboclaw.write(chr(128));
+    roboclaw.write(chr(FULLREVERSE[1]));
     sleep(0.001)
     GPIO.output(24, GPIO.LOW)
     sleep(1)
@@ -123,7 +123,8 @@ if __name__ == "__main__":
         sleep(1) """
         
         forward()
-        #backward()
+        
+        backward()
         
         stop()
         sleep(2)
