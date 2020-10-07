@@ -79,24 +79,69 @@ def left(drivetime, inputspeed):
         rspeed = HALF_REVERSE
     
     # REAR MOTOR
-    GPIO.output(24, GPIO.HIGH)
+    GPIO.output(23, GPIO.HIGH)
     #Forward 1
     roboclaw.write(chr(fspeed[0])); # RIGHT X
     #Backward 2
     roboclaw.write(chr(rspeed[1])); # LEFT X
     
     sleep(MOTORWAITTIME)
-    GPIO.output(24, GPIO.LOW)
+    GPIO.output(23, GPIO.LOW)
     
     # FRONT MOTOR 
-    GPIO.output(23, GPIO.HIGH)
+    GPIO.output(24, GPIO.HIGH)
     #Forward 1
     roboclaw.write(chr(fspeed[0])); # LEFT X
     #Backward 2
     roboclaw.write(chr(rspeed[1])); # RIGHT X
 
     sleep(MOTORWAITTIME)
+    GPIO.output(24, GPIO.LOW)
+    sleep(drivetime)
+
+def right(drivetime, inputspeed):
+    global MOTORWAITTIME
+    global FULL_FORWARD
+    global FULL_REVERSE
+    global HALF_FORWARD
+    global HALF_REVERSE
+    fspeed = 0
+    rspeed = 0
+    
+    if inputspeed == 'HIGH':
+        fspeed = FULL_FORWARD
+        rspeed = FULL_REVERSE
+    elif inputspeed == 'LOW':
+        fspeed = HALF_FORWARD
+        rspeed = HALF_REVERSE
+    
+    # REAR MOTOR
+    GPIO.output(23, GPIO.HIGH)
+    #Forward 1
+    #roboclaw.write(chr(FULL_FORWARD[0])); # RIGHT x
+    #Forward 2
+    roboclaw.write(chr(FULL_FORWARD[1])); # LEFT
+    #Backward 1
+    roboclaw.write(chr(FULL_REVERSE[0])); # RIGHT 
+    #Backward 2
+    #roboclaw.write(chr(FULL_REVERSE[1])); # LEFT x
+    
+    sleep(MOTORWAITTIME)
     GPIO.output(23, GPIO.LOW)
+    
+    # FRONT MOTOR 
+    GPIO.output(24, GPIO.HIGH)
+    #Forward 1
+    #roboclaw.write(chr(FULL_FORWARD[0])); # LEFT x
+    #Forward 2
+    roboclaw.write(chr(FULL_FORWARD[1])); # RIGHT
+    #Backward 1
+    roboclaw.write(chr(FULL_REVERSE[0])); # LEFT
+    #Backward 2
+    #roboclaw.write(chr(FULL_REVERSE[1])); # RIGHT x
+
+    sleep(MOTORWAITTIME)
+    GPIO.output(24, GPIO.LOW)
     sleep(drivetime)
 
 def run_controller(pin, speed):
@@ -106,7 +151,7 @@ def run_controller(pin, speed):
     roboclaw.write(chr(speed));
     #sleep(run_time)
     
-def forward(drivetime):
+def forward(drivetime, inputspeed):
     global MOTORWAITTIME
     global FULL_FORWARD
     global HALF_FORWARD
@@ -189,10 +234,11 @@ if __name__ == "__main__":
     while(1):
         #GPIO.cleanup()
         
-        #forward(1)
+        #forward(1, 'LOW')
         #stop()
         #sleep(0.5)
-        left(1, 'LOW')
+        #left(1, 'LOW')
+        right(1,'LOW')
         
         stop()
         sleep(2)
