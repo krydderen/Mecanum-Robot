@@ -57,7 +57,7 @@ if __name__ == "__main__":
         #Backward 1
         #roboclaw.write(chr(1));
         #Forward 2
-        #roboclaw.write(chr(255));
+        roboclaw.write(chr(255));
         #Backward 2
         #roboclaw.write(chr(128));
         #It gotta slee??
@@ -71,7 +71,7 @@ if __name__ == "__main__":
         #Backward 1
         #roboclaw.write(chr(1));
         #Forward 2
-        #roboclaw.write(chr(255));
+        roboclaw.write(chr(255));
         #Backward 2
         #roboclaw.write(chr(128));
         #GPIO.output(24, GPIO.LOW)
