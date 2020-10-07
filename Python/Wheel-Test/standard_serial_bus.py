@@ -3,18 +3,101 @@ from time import sleep
 import RPi.GPIO as GPIO
 
 global roboclaw
-global HALFFORWARD
-global HALFREVERSE
-global FULLFORWARD
-global FULLREVERSE
+global HALF_FORWARD
+global HALF_REVERSE
+global FULL_FORWARD
+global FULL_REVERSE
 global FULLSTOP
+global MOTORWAITTIME
 
-FULLFORWARD = [127  , 255]
-FULLREVERSE = [1    , 128]
+FULL_FORWARD = [127  , 255]
+FULL_REVERSE = [1    , 128]
 FULLSTOP    = 0
-HALFFORWARD = [98   , 225]
-HALFREVERSE = [30   , 158]
+HALF_FORWARD = [98   , 225]
+HALF_REVERSE = [30   , 158]
+MOTORWAITTIME = 0.002
 
+def motion():
+    global MOTORWAITTIME
+    global FULL_FORWARD
+    global FULL_REVERSE
+    global HALF_FORWARD
+    global HALF_REVERSE
+    fspeed = 0
+    rspeed = 0
+    
+    if inputspeed == 'HIGH':
+        fspeed = FULL_FORWARD
+        rspeed = FULL_REVERSE
+    elif inputspeed == 'LOW':
+        fspeed = HALF_FORWARD
+        rspeed = HALF_REVERSE
+        
+    # REAR MOTOR
+    GPIO.output(23, GPIO.HIGH)
+    #Forward 1
+    roboclaw.write(chr(FULL_FORWARD[0])); # RIGHT 
+    #Forward 2
+    roboclaw.write(chr(FULL_FORWARD[1])); # LEFT
+    #Backward 1
+    roboclaw.write(chr(FULL_REVERSE[0])); # RIGHT 
+    #Backward 2
+    roboclaw.write(chr(FULL_REVERSE[1])); # LEFT 
+    
+    sleep(MOTORWAITTIME)
+    GPIO.output(23, GPIO.LOW)
+    
+    # FRONT MOTOR 
+    GPIO.output(24, GPIO.HIGH)
+    #Forward 1
+    roboclaw.write(chr(FULL_FORWARD[0])); # LEFT 
+    #Forward 2
+    roboclaw.write(chr(FULL_FORWARD[1])); # RIGHT
+    #Backward 1
+    roboclaw.write(chr(FULL_REVERSE[0])); # LEFT
+    #Backward 2
+    roboclaw.write(chr(FULL_REVERSE[1])); # RIGHT 
+
+    sleep(MOTORWAITTIME)
+    GPIO.output(24, GPIO.LOW)
+    sleep(1)
+    
+def left(drivetime, inputspeed):
+    global MOTORWAITTIME
+    global FULL_FORWARD
+    global FULL_REVERSE
+    global HALF_FORWARD
+    global HALF_REVERSE
+    fspeed = 0
+    rspeed = 0
+    
+    if inputspeed == 'HIGH':
+        fspeed = FULL_FORWARD
+        rspeed = FULL_REVERSE
+    elif inputspeed == 'LOW':
+        fspeed = HALF_FORWARD
+        rspeed = HALF_REVERSE
+    
+    # REAR MOTOR
+    GPIO.output(24, GPIO.HIGH)
+    #Forward 1
+    roboclaw.write(chr(fspeed[0])); # RIGHT X
+    #Backward 2
+    roboclaw.write(chr(rspeed[1])); # LEFT X
+    
+    sleep(MOTORWAITTIME)
+    GPIO.output(24, GPIO.LOW)
+    
+    # FRONT MOTOR 
+    GPIO.output(23, GPIO.HIGH)
+    #Forward 1
+    roboclaw.write(chr(fspeed[0])); # LEFT X
+    #Backward 2
+    roboclaw.write(chr(rspeed[1])); # RIGHT X
+
+    sleep(MOTORWAITTIME)
+    GPIO.output(23, GPIO.LOW)
+    sleep(drivetime)
 
 def run_controller(pin, speed):
     
@@ -23,54 +106,61 @@ def run_controller(pin, speed):
     roboclaw.write(chr(speed));
     #sleep(run_time)
     
-def forward():
-    global roboclaw
-    global FULLFORWARD
-    global HALFFORWARD
+def forward(drivetime):
+    global MOTORWAITTIME
+    global FULL_FORWARD
+    global HALF_FORWARD
+    fspeed = 0
+    
+    if inputspeed == 'HIGH':
+        fspeed = FULL_FORWARD
+    elif inputspeed == 'LOW':
+        fspeed = HALF_FORWARD
     
     GPIO.output(23, GPIO.HIGH)
     #Forward 1
-    roboclaw.write(chr(HALFFORWARD[0]));
+    roboclaw.write(chr(fspeed[0]));
     #Forward 2
-    roboclaw.write(chr(HALFFORWARD[1]));
-    sleep(0.001)
+    roboclaw.write(chr(fspeed[1]));
+    sleep(MOTORWAITTIME)
     GPIO.output(23, GPIO.LOW)
     
     GPIO.output(24, GPIO.HIGH)
     #Forward 1
-    roboclaw.write(chr(HALFFORWARD[0]));
+    roboclaw.write(chr(fspeed[0]));
     #Forward 2
-    roboclaw.write(chr(HALFFORWARD[1]));
-    sleep(0.001)
+    roboclaw.write(chr(fspeed[1]));
+    sleep(MOTORWAITTIME)
     GPIO.output(24, GPIO.LOW)
-    sleep(1)
+    sleep(drivetime)
     
-def backward():
-    global roboclaw
-    global FULLREVERSE
-    global HALFREVERSE
+def backward(drivetime):
+    global MOTORWAITTIME
+    global FULL_REVERSE
+    global HALF_REVERSE
     
     GPIO.output(23, GPIO.HIGH)
     #Backward 1
-    roboclaw.write(chr(HALFREVERSE[0]));
+    roboclaw.write(chr(HALF_REVERSE[0]));
     #Backward 2
-    roboclaw.write(chr(HALFREVERSE[1]));
-    sleep(0.001)
+    roboclaw.write(chr(HALF_REVERSE[1]));
+    sleep(MOTORWAITTIME)
     GPIO.output(23, GPIO.LOW)
     
     GPIO.output(24, GPIO.HIGH)
     #Backward 1
-    roboclaw.write(chr(HALFREVERSE[0]));
+    roboclaw.write(chr(HALF_REVERSE[0]));
     #Backward 2
-    roboclaw.write(chr(HALFREVERSE[1]));
-    sleep(0.001)
+    roboclaw.write(chr(HALF_REVERSE[1]));
+    sleep(MOTORWAITTIME)
     GPIO.output(24, GPIO.LOW)
-    sleep(1)
+    sleep(drivetime)
         
 def stop_controller(pin):
+    global MOTORWAITTIME
     GPIO.output(pin, GPIO.HIGH)
     roboclaw.write(chr(0));
-    sleep(.001);
+    sleep(MOTORWAITTIME);
     GPIO.output(pin, GPIO.LOW)
     
 def stop():
@@ -99,38 +189,10 @@ if __name__ == "__main__":
     while(1):
         #GPIO.cleanup()
         
-        """ GPIO.output(23, GPIO.HIGH)
-        #sleep(.2);
-        #Forward 1
-        roboclaw.write(chr(127));
-        #Backward 1
-        #roboclaw.write(chr(1));
-        #Forward 2
-        roboclaw.write(chr(255));
-        #Backward 2
-        #roboclaw.write(chr(128));
-        #It gotta slee??
-        sleep(0.001)
-        GPIO.output(23, GPIO.LOW)
-        
-        GPIO.output(24, GPIO.HIGH)
-        #sleep(.2);
-        #Forward 1
-        roboclaw.write(chr(127));
-        #Backward 1
-        #roboclaw.write(chr(1));
-        #Forward 2
-        roboclaw.write(chr(255));
-        #Backward 2
-        #roboclaw.write(chr(128));
-        #GPIO.output(24, GPIO.LOW)
-        sleep(0.001)
-        GPIO.output(24, GPIO.LOW)
-        sleep(1) """
-        
-        forward()
-        
-        backward()
+        #forward(1)
+        #stop()
+        #sleep(0.5)
+        left(1, 'LOW')
         
         stop()
         sleep(2)
