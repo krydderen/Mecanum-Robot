@@ -26,19 +26,21 @@ while run:
     if keys[pygame.K_LEFT]:
         x -= vel
         print('left')
-        motor_controller.left(drivetime = 1, inputspeed = 'LOW')
+        motor_controller.left(drivetime = 0.2, inputspeed = 'LOW')
     if keys[pygame.K_RIGHT]:
         x += vel
         print('right')
-        motor_controller.right(drivetime = 1, inputspeed = 'LOW')
+        motor_controller.right(drivetime = 0.2, inputspeed = 'LOW')
     if keys[pygame.K_UP]:
         y -= vel
         print('up')
-        motor_controller.forward(drivetime = 1, inputspeed = 'LOW')
+        motor_controller.forward(drivetime = 0.2, inputspeed = 'LOW')
     if keys[pygame.K_DOWN]:
         y += vel
         print('down')
-        motor_controller.backward(drivetime = 1, inputspeed = 'LOW')
+        motor_controller.backward(drivetime = 0.05, inputspeed = 'HIGH')
+    else:
+        motor_controller.stop()
         
     win.fill((0,0,0))  # Fills the screen with black
     pygame.draw.rect(win, (255,0,0), (x, y, width, height))   

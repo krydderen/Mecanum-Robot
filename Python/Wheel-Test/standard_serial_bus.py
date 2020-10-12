@@ -235,11 +235,11 @@ if __name__ == "__main__":
     while(1):
         #GPIO.cleanup()
         
-        #forward(1, 'LOW')
+        forward(1, 'LOW')
         #stop()
         #sleep(0.5)
         #left(1, 'LOW')
-        right(1,'LOW')
+        #right(1,'LOW')
         
         stop()
         sleep(2)

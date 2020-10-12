@@ -6,10 +6,10 @@ class MotorController:
     
     __FULL_FORWARD    = [127  , 255]
     __FULL_REVERSE    = [1    , 128]
-    __FULLSTOP        = 0
+    __FULL_STOP        = 0
     __HALF_FORWARD    = [98   , 225]
     __HALF_REVERSE    = [30   , 158]
-    __MOTORWAITTIME   = 0.002
+    __MOTOR_WAIT_TIME   = 0.02
     
     def __init__(self):
         #Configure serial 
@@ -32,7 +32,7 @@ class MotorController:
         if inputspeed   == 'HIGH':
             self.fspeed = self.__FULL_FORWARD
             self.rspeed == self.__FULL_REVERSE
-        elif inputspeed == 'LOW': ##else istede førr elif??
+        elif inputspeed == 'LOW': ##else istede frr elif??
             self.fspeed = self.__HALF_FORWARD
             self.rspeed = self.__HALF_REVERSE
         
@@ -41,7 +41,7 @@ class MotorController:
         GPIO.output(23, GPIO.HIGH)
         self.roboclaw.write(chr(self.fspeed[0]));
         self.roboclaw.write(chr(self.rspeed[1]));
-        sleep(self.MOTORWAITTIME)
+        sleep(self.__MOTOR_WAIT_TIME)
         GPIO.output(23, GPIO.LOW)
         
         # FRONT MOTOR 
@@ -49,7 +49,7 @@ class MotorController:
         GPIO.output(24, GPIO.HIGH)
         self.roboclaw.write(chr(self.fspeed[0]));
         self.roboclaw.write(chr(self.rspeed[1]));
-        sleep(self.MOTORWAITTIME)
+        sleep(self.__MOTOR_WAIT_TIME)
         GPIO.output(24, GPIO.LOW)
         
         sleep(drivetime)
@@ -70,7 +70,7 @@ class MotorController:
         GPIO.output(23, GPIO.HIGH)
         self.roboclaw.write(chr(self.fspeed[1]));
         self.roboclaw.write(chr(self.rspeed[0]));
-        sleep(self.MOTORWAITTIME)
+        sleep(self.__MOTOR_WAIT_TIME)
         GPIO.output(23, GPIO.LOW)
         
         # FRONT MOTOR 
@@ -78,7 +78,7 @@ class MotorController:
         GPIO.output(24, GPIO.HIGH)
         self.roboclaw.write(chr(self.fspeed[1]));
         self.roboclaw.write(chr(self.rspeed[0]));
-        sleep(self.MOTORWAITTIME)
+        sleep(self.__MOTOR_WAIT_TIME)
         GPIO.output(24, GPIO.LOW)
         
         sleep(drivetime)
@@ -95,14 +95,14 @@ class MotorController:
         GPIO.output(23, GPIO.HIGH)
         self.roboclaw.write(chr(self.fspeed[0]));
         self.roboclaw.write(chr(self.fspeed[1]));
-        sleep(self.MOTORWAITTIME)
+        sleep(self.__MOTOR_WAIT_TIME)
         GPIO.output(23, GPIO.LOW)
         
         # Write forward for 1 and 2
         GPIO.output(24, GPIO.HIGH)
         self.roboclaw.write(chr(self.fspeed[0]));
         self.roboclaw.write(chr(self.fspeed[1]));
-        sleep(self.MOTORWAITTIME)
+        sleep(self.__MOTOR_WAIT_TIME)
         GPIO.output(24, GPIO.LOW)
         
         sleep(drivetime)
@@ -119,22 +119,22 @@ class MotorController:
         GPIO.output(23, GPIO.HIGH)
         self.roboclaw.write(chr(self.rspeed[0]));
         self.roboclaw.write(chr(self.rspeed[1]));
-        sleep(self.__MOTORWAITTIME)
+        sleep(self.__MOTOR_WAIT_TIME)
         GPIO.output(23, GPIO.LOW)
         
         # Write backward for 1 and 2
         GPIO.output(24, GPIO.HIGH)
         self.roboclaw.write(chr(self.rspeed[0]));
         self.roboclaw.write(chr(self.rspeed[1]));
-        sleep(self.__MOTORWAITTIME)
+        sleep(self.__MOTOR_WAIT_TIME)
         GPIO.output(24, GPIO.LOW)
         
         sleep(drivetime)
         
     def stop_controller(self, pin):
         GPIO.output(pin, GPIO.HIGH)
-        self.roboclaw.write(chr(self.__FULLSTOP));
-        sleep(self.__MOTORWAITTIME);
+        self.roboclaw.write(chr(self.__FULL_STOP));
+        sleep(self.__MOTOR_WAIT_TIME);
         GPIO.output(pin, GPIO.LOW)
         
     def stop(self):
