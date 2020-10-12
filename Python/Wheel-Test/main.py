@@ -23,7 +23,7 @@ while run:
         if event.type == pygame.QUIT:
             run = False
 
-    keys = pygame.key.get_pressed()
+    """keys = pygame.key.get_pressed()
     
     if keys[pygame.K_LEFT]:
         x -= vel
@@ -41,6 +41,32 @@ while run:
         y += vel
         print('down')
         motor_controller.backward(drivetime = drive_time, inputspeed = 'LOW')
+    else:
+        motor_controller.stop()"""
+    
+    if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_UP or event.key == ord('w'):
+            print('up')
+            y -= vel
+            motor_controller.forward(drivetime = drive_time, inputspeed = 'LOW')
+        elif event.key == pygame.K_DOWN or event.key == ord('s'):
+            print('down')
+            y += vel
+            motor_controller.backward(drivetime = drive_time, inputspeed = 'LOW')
+        elif event.key == pygame.K_LEFT or event.key == ord('a'):
+            print('left')
+            x -= vel
+            motor_controller.left(drivetime = drive_time, inputspeed = 'LOW')
+        elif event.key == pygame.K_RIGHT or event.key == ord('d'):
+            print('right')
+            x += vel
+            motor_controller.right(drivetime = drive_time, inputspeed = 'LOW')
+        elif event.key == ord('q'):
+            print('counterclockwise')
+            motor_controller.rotate(direction = 'COUNTER_CLOCKWISE',drivetime = drive_time, inputspeed = 'LOW')
+        elif event.key == ord('e'):
+            print('clockwise')
+            motor_controller.rotate(direction = 'CLOCKWISE',drivetime = drive_time, inputspeed = 'LOW')
     else:
         motor_controller.stop()
         
