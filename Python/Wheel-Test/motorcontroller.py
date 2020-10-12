@@ -157,31 +157,31 @@ class MotorController:
         if direction == 'CLOCKWISE':
             # REAR MOTOR left motor forward and right motor backward
             GPIO.output(23, GPIO.HIGH)
-            self.roboclaw.write(chr(self.fspeed[1])); # LEFT X
-            self.roboclaw.write(chr(self.rspeed[0])); # RIGHT X
-            sleep(self.__MOTORWAITTIME)
+            self.roboclaw.write(chr(self.rspeed[1])); # RIGHT X
+            self.roboclaw.write(chr(self.fspeed[0])); # LEFT X
+            sleep(self.__MOTOR_WAIT_TIME)
             GPIO.output(23, GPIO.LOW)
             
             # FRONT MOTOR left motor forward and right motor backward
             GPIO.output(24, GPIO.HIGH)
             self.roboclaw.write(chr(self.fspeed[1])); # LEFT X
             self.roboclaw.write(chr(self.rspeed[0])); # RIGHT 
-            sleep(self.__MOTORWAITTIME)
+            sleep(self.__MOTOR_WAIT_TIME)
             GPIO.output(24, GPIO.LOW)
             sleep(drivetime)
             
         elif direction == 'COUNTER_CLOCKWISE':
             # REAR MOTOR left motor forward and right motor backward
             GPIO.output(23, GPIO.HIGH)
-            self.roboclaw.write(chr(self.fspeed[0])); # LEFT X
-            self.roboclaw.write(chr(self.rspeed[1])); # RIGHT X
-            sleep(self.__MOTORWAITTIME)
+            self.roboclaw.write(chr(self.fspeed[1])); # RIGHT X
+            self.roboclaw.write(chr(self.rspeed[0])); # LEFT X
+            sleep(self.__MOTOR_WAIT_TIME)
             GPIO.output(23, GPIO.LOW)
             
             # FRONT MOTOR left motor forward and right motor backward
             GPIO.output(24, GPIO.HIGH)
-            self.roboclaw.write(chr(self.fspeed[0])); # LEFT X
-            self.roboclaw.write(chr(self.rspeed[1])); # RIGHT 
-            sleep(self.__MOTORWAITTIME)
+            self.roboclaw.write(chr(self.rspeed[1])); # LEFT X
+            self.roboclaw.write(chr(self.fspeed[0])); # RIGHT 
+            sleep(self.__MOTOR_WAIT_TIME)
             GPIO.output(24, GPIO.LOW)
             sleep(drivetime)
