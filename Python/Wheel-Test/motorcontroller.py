@@ -87,9 +87,9 @@ class MotorController:
         self.fspeed = 0
         
         if inputspeed == 'HIGH':
-            fspeed = self.__FULL_FORWARD
+            self.fspeed = self.__FULL_FORWARD
         elif inputspeed == 'LOW':
-            fspeed = self.__HALF_FORWARD
+            self.fspeed = self.__HALF_FORWARD        
         
         # Write forward for 1 and 2
         GPIO.output(23, GPIO.HIGH)

@@ -10,12 +10,14 @@ x = 50
 y = 50
 width = 40
 height = 60
-vel = 5
+vel = 5*2
+
+drive_time = 0.2
 
 run = True
 motor_controller = MotorController()
 while run:
-    pygame.time.delay(50)
+    pygame.time.delay(25)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -26,19 +28,19 @@ while run:
     if keys[pygame.K_LEFT]:
         x -= vel
         print('left')
-        motor_controller.left(drivetime = 0.2, inputspeed = 'LOW')
-    if keys[pygame.K_RIGHT]:
+        motor_controller.left(drivetime = drive_time, inputspeed = 'LOW')
+    elif keys[pygame.K_RIGHT]:
         x += vel
         print('right')
-        motor_controller.right(drivetime = 0.2, inputspeed = 'LOW')
-    if keys[pygame.K_UP]:
+        motor_controller.right(drivetime = drive_time, inputspeed = 'LOW')
+    elif keys[pygame.K_UP]:
         y -= vel
         print('up')
-        motor_controller.forward(drivetime = 0.2, inputspeed = 'LOW')
-    if keys[pygame.K_DOWN]:
+        motor_controller.forward(drivetime = drive_time, inputspeed = 'LOW')
+    elif keys[pygame.K_DOWN]:
         y += vel
         print('down')
-        motor_controller.backward(drivetime = 0.05, inputspeed = 'HIGH')
+        motor_controller.backward(drivetime = drive_time, inputspeed = 'LOW')
     else:
         motor_controller.stop()
         
