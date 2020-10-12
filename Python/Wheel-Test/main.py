@@ -1,4 +1,4 @@
-from .motorcontroller import MotorController
+from motorcontroller import MotorController
 import pygame
 pygame.init()
 
