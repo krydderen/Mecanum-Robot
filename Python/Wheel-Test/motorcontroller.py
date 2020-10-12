@@ -3,6 +3,7 @@ from time import sleep
 import RPi.GPIO as GPIO
 
 class MotorController:
+    
     __FULL_FORWARD    = [127  , 255]
     __FULL_REVERSE    = [1    , 128]
     __FULLSTOP        = 0
@@ -14,7 +15,7 @@ class MotorController:
         #Configure serial 
         serial_port = "/dev/ttyS0"
         baudrate = 38400
-        roboclaw = Serial(serial_port, baudrate, timeout=1)
+        self.roboclaw = Serial(serial_port, baudrate, timeout=1)
         
         #Configure GPIO
         
