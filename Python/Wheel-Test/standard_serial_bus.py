@@ -25,6 +25,7 @@ def motion():
     global HALF_REVERSE
     fspeed = 0
     rspeed = 0
+    inputspeed = ''
     
     if inputspeed == 'HIGH':
         fspeed = FULL_FORWARD
