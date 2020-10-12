@@ -140,3 +140,48 @@ class MotorController:
     def stop(self):
         self.stop_controller(slave_select_pins[0])
         self.stop_controller(slave_select_pins[1])
+
+    def rotate(self, drivetime, direction, inputspeed):
+        self.fspeed = 0
+        self.rspeed = 0
+        
+        if inputspeed   == 'HIGH':
+            self.fspeed = self.__FULL_FORWARD
+            self.rspeed = self.__FULL_REVERSE
+        elif inputspeed == 'LOW':
+            self.fspeed = self.__HALF_FORWARD
+            self.rspeed = self.__HALF_REVERSE
+        else:
+            print('kys')
+        
+        if direction == 'CLOCKWISE':
+            # REAR MOTOR left motor forward and right motor backward
+            GPIO.output(23, GPIO.HIGH)
+            self.roboclaw.write(chr(self.fspeed[1])); # LEFT X
+            self.roboclaw.write(chr(self.rspeed[0])); # RIGHT X
+            sleep(self.__MOTORWAITTIME)
+            GPIO.output(23, GPIO.LOW)
+            
+            # FRONT MOTOR left motor forward and right motor backward
+            GPIO.output(24, GPIO.HIGH)
+            self.roboclaw.write(chr(self.fspeed[1])); # LEFT X
+            self.roboclaw.write(chr(self.rspeed[0])); # RIGHT 
+            sleep(self.__MOTORWAITTIME)
+            GPIO.output(24, GPIO.LOW)
+            sleep(drivetime)
+            
+        elif direction == 'COUNTER_CLOCKWISE':
+            # REAR MOTOR left motor forward and right motor backward
+            GPIO.output(23, GPIO.HIGH)
+            self.roboclaw.write(chr(self.fspeed[0])); # LEFT X
+            self.roboclaw.write(chr(self.rspeed[1])); # RIGHT X
+            sleep(self.__MOTORWAITTIME)
+            GPIO.output(23, GPIO.LOW)
+            
+            # FRONT MOTOR left motor forward and right motor backward
+            GPIO.output(24, GPIO.HIGH)
+            self.roboclaw.write(chr(self.fspeed[0])); # LEFT X
+            self.roboclaw.write(chr(self.rspeed[1])); # RIGHT 
+            sleep(self.__MOTORWAITTIME)
+            GPIO.output(24, GPIO.LOW)
+            sleep(drivetime)
