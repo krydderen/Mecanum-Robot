@@ -79,6 +79,8 @@ while run:
         elif event.key == ord('e'):
             print('clockwise')
             motor_controller.rotate(direction = 'CLOCKWISE',drivetime = drive_time, inputspeed = drive_speed)
+    elif diagonals != True:
+        pass
     else:
         motor_controller.stop()
         
