@@ -21,10 +21,12 @@ while run:
     pygame.time.delay(25)
 
     for event in pygame.event.get():
-        if event.type == pygame.QUIT or pygame.key.get_pressed()[pygame.K_q]:
+        if event.type == pygame.QUIT:
             run = False
     
     keys = pygame.key.get_pressed()
+    
+    diagonals = False
     
     if keys[pygame.K_w] and keys[pygame.K_d]:
         print('wd')
@@ -36,7 +38,7 @@ while run:
         print('sa')
         
         
-    if event.type == pygame.KEYDOWN:
+    if event.type == pygame.KEYDOWN and diagonals != True:
         if event.key == pygame.K_UP or event.key == ord('w'):
             print('up')
             y -= vel
