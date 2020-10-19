@@ -28,6 +28,7 @@ while run:
     
     diagonals = False
     
+    
     if keys[pygame.K_w] and keys[pygame.K_d]:
         print('wd')
         diagonals = True
@@ -40,6 +41,13 @@ while run:
     elif keys[pygame.K_s] and keys[pygame.K_a]:
         print('sa')
         diagonals = True
+    elif keys[pygame.K_t]:
+        if drive_speed == 'LOW':
+            drive_speed = 'HIGH'
+            print('Drive speed is now HIGH')
+        elif drive_speed == 'HIGH':
+            drive_speed = 'LOW'
+            print('Drive speed is now LOW')       
         
         
     if event.type == pygame.KEYDOWN and diagonals != True:
