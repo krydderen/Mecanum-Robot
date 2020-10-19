@@ -1,19 +1,40 @@
 import socket
+import threading
 
+HEADER = 64
+PORT = 5050
+SERVER = socket.gethostbyname(socket.gethostname())
+ADDR = (SERVER, PORT)
+FORMAT = 'utf-8'
+DISCONNECT_MESSAGE = '!DISCONNECT'
 
-TCP_IP = 'localhost' #'192.168.43.18' #127.0.0.1
-TCP_PORT = 5005
-BUFFER_SIZE = 20  # Normally 1024, but we want fast response
+server= socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.bind(ADDR)
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((TCP_IP, TCP_PORT))
-s.listen(1)
+def handle_client(conn, addr):
+    print(f"[NEW CONNECTION] {addr} connected.")
+    
+    connected = True
+    while connected:
+        msg_lenght = conn.recv(HEADER).decode(FORMAT)
+        if msg_lenght:
+            msg_lenght = int(msg_lenght)
+            msg = conn.recv(msg_lenght).decode(FORMAT)
+            if msg == DISCONNECT_MESSAGE:
+                connected = False
+                
+            print(f"[{addr}] {msg}")
+            conn.send("[SERVER] Msg recieved.".encode(FORMAT))
+    conn.close()
 
-conn, addr = s.accept()
-print('Connection address:', addr)
-while 1:
-    data = conn.recv(BUFFER_SIZE)
-    if not data: break
-    print("received data:", data)
-    conn.send(data + b' egil')  # echo
-conn.close()
+def start():
+    server.listen()
+    print(f"[LISTENING] Server is listening on {SERVER}")
+    while True:
+        conn, addr = server.accept()
+        thread = threading.Thread(target=handle_client, args=(conn, addr))
+        thread.start()
+        print(f"[ACTIVE CONNECTIONS] {threading.active_count() - 1}")
+        
+print("[STARTING] Server is starting...")
+start()
