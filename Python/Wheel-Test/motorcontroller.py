@@ -83,7 +83,7 @@ class MotorController:
         
         sleep(drivetime)
     
-    def diagonal(self, drivetime, inputspeed):
+    def wddiagonal(self, drivetime, inputspeed):
         self.fspeed = 0
         self.rspeed = 0
         
@@ -110,24 +110,92 @@ class MotorController:
         GPIO.output(24, GPIO.LOW)
         
         sleep(drivetime)
+        
+    def wadiagonal(self, drivetime, inputspeed):
+        self.fspeed = 0
+        self.rspeed = 0
+        
+        if inputspeed   == 'HIGH':
+            self.fspeed = self.__FULL_FORWARD
+            self.rspeed = self.__FULL_REVERSE
+        elif inputspeed == 'LOW':
+            self.fspeed = self.__HALF_FORWARD
+            self.rspeed = self.__HALF_REVERSE       
+        
+        
+         # REAR MOTOR
+        # Write forward for motor 2 
+        GPIO.output(23, GPIO.HIGH)
+        self.roboclaw.write(chr(self.fspeed[0]));
+        sleep(self.__MOTOR_WAIT_TIME)
+        GPIO.output(23, GPIO.LOW)
+        
+        # FRONT MOTOR 
+        # Write forward for motor 2
+        GPIO.output(24, GPIO.HIGH)
+        self.roboclaw.write(chr(self.fspeed[0]));
+        sleep(self.__MOTOR_WAIT_TIME)
+        GPIO.output(24, GPIO.LOW)
+        
+        sleep(drivetime)
+        
+    def sddiagonal(self, drivetime, inputspeed):
+        self.fspeed = 0
+        self.rspeed = 0
+        
+        if inputspeed   == 'HIGH':
+            self.fspeed = self.__FULL_FORWARD
+            self.rspeed = self.__FULL_REVERSE
+        elif inputspeed == 'LOW':
+            self.fspeed = self.__HALF_FORWARD
+            self.rspeed = self.__HALF_REVERSE       
+        
+        
+         # REAR MOTOR
+        # Write forward for motor 2 
+        GPIO.output(23, GPIO.HIGH)
+        self.roboclaw.write(chr(self.rspeed[1]));
+        sleep(self.__MOTOR_WAIT_TIME)
+        GPIO.output(23, GPIO.LOW)
+        
+        # FRONT MOTOR 
+        # Write forward for motor 2
+        GPIO.output(24, GPIO.HIGH)
+        self.roboclaw.write(chr(self.rspeed[1]));
+        sleep(self.__MOTOR_WAIT_TIME)
+        GPIO.output(24, GPIO.LOW)
+        
+        sleep(drivetime)
+        
+    def sadiagonal(self, drivetime, inputspeed):
+        self.fspeed = 0
+        self.rspeed = 0
+        
+        if inputspeed   == 'HIGH':
+            self.fspeed = self.__FULL_FORWARD
+            self.rspeed = self.__FULL_REVERSE
+        elif inputspeed == 'LOW':
+            self.fspeed = self.__HALF_FORWARD
+            self.rspeed = self.__HALF_REVERSE       
+        
+        
+         # REAR MOTOR
+        # Write forward for motor 2 
+        GPIO.output(23, GPIO.HIGH)
+        self.roboclaw.write(chr(self.rspeed[0]));
+        sleep(self.__MOTOR_WAIT_TIME)
+        GPIO.output(23, GPIO.LOW)
+        
+        # FRONT MOTOR 
+        # Write forward for motor 2
+        GPIO.output(24, GPIO.HIGH)
+        self.roboclaw.write(chr(self.rspeed[0]));
+        sleep(self.__MOTOR_WAIT_TIME)
+        GPIO.output(24, GPIO.LOW)
+        
+        sleep(drivetime)
     
-        
-        # # Write forward for 1 and 2
-        # GPIO.output(23, GPIO.HIGH)
-        # #self.roboclaw.write(chr(self.fspeed[0]));
-        # self.roboclaw.write(chr(self.fspeed[1]));
-        # sleep(self.__MOTOR_WAIT_TIME)
-        # GPIO.output(23, GPIO.LOW)
-        
-        # # Write forward for 1 and 2
-        # GPIO.output(24, GPIO.HIGH)
-        # #self.roboclaw.write(chr(self.fspeed[0]));
-        # self.roboclaw.write(chr(self.fspeed[1]));
-        # sleep(self.__MOTOR_WAIT_TIME)
-        # GPIO.output(24, GPIO.LOW)
-        
-        # sleep(drivetime) 
-    
+
     def forward(self, drivetime, inputspeed):
         self.fspeed = 0
         
