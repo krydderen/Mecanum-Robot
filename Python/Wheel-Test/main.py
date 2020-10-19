@@ -29,19 +29,19 @@ while run:
     move = False
     
     
-    if keys[pygame.K_w] and keys[pygame.K_d]:
+    if (keys[pygame.K_w] and keys[pygame.K_d])   or (keys[pygame.K_UP] and keys[pygame.K_RIGHT]):
         print('wd')
         move = True; y -= vel; x += vel
         motor_controller.wddiagonal(drivetime = drive_time, inputspeed = drive_speed)
-    elif keys[pygame.K_w] and keys[pygame.K_a]:
+    elif (keys[pygame.K_w] and keys[pygame.K_a]) or (keys[pygame.K_UP] and keys[pygame.K_LEFT]):
         print('wa')
         move = True; y -= vel; x -= vel
         motor_controller.wadiagonal(drivetime = drive_time, inputspeed = drive_speed)
-    elif keys[pygame.K_s] and keys[pygame.K_d]:
+    elif (keys[pygame.K_s] and keys[pygame.K_d]) or (keys[pygame.K_DOWN] and keys[pygame.K_RIGHT]):
         print('sd')
         move = True; y += vel; x = vel
         motor_controller.sddiagonal(drivetime = drive_time, inputspeed = drive_speed)
-    elif keys[pygame.K_s] and keys[pygame.K_a]:
+    elif (keys[pygame.K_s] and keys[pygame.K_a]) or (keys[pygame.K_DOWN] and keys[pygame.K_LEFT]):
         print('sa')
         move = True; y += vel; x -= vel
         motor_controller.sadiagonal(drivetime = drive_time, inputspeed = drive_speed)
