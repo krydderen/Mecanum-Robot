@@ -32,20 +32,22 @@ while run:
     if keys[pygame.K_w] and keys[pygame.K_d]:
         print('wd')
         diagonals = True; y -= vel; x += vel
-        motor_controller.diagonals(drivetime = drive_time, inputspeed = drive_speed)
+        motor_controller.diagonal(drivetime = drive_time, inputspeed = drive_speed)
     elif keys[pygame.K_w] and keys[pygame.K_a]:
         print('wa')
         diagonals = True; y -= vel; x -= vel
-        motor_controller.diagonals(drivetime = drive_time, inputspeed = drive_speed)
+        motor_controller.diagonal(drivetime = drive_time, inputspeed = drive_speed)
     elif keys[pygame.K_s] and keys[pygame.K_d]:
         print('sd')
         diagonals = True; y += vel; x = vel
-        motor_controller.diagonals(drivetime = drive_time, inputspeed = drive_speed)
+        motor_controller.diagonal(drivetime = drive_time, inputspeed = drive_speed)
     elif keys[pygame.K_s] and keys[pygame.K_a]:
         print('sa')
         diagonals = True; y += vel; x -= vel
-        motor_controller.diagonals(drivetime = drive_time, inputspeed = drive_speed)
-    elif keys[pygame.K_t]:
+        motor_controller.diagonal(drivetime = drive_time, inputspeed = drive_speed)
+    
+    # Change motor speed to high or low.
+    if keys[pygame.K_t]:
         if drive_speed == 'LOW':
             drive_speed = 'HIGH'
             print('Drive speed is now HIGH')
