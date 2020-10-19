@@ -139,7 +139,7 @@ class MotorController:
         
         sleep(drivetime)
         
-    def sddiagonal(self, drivetime, inputspeed):
+    def sadiagonal(self, drivetime, inputspeed):
         self.fspeed = 0
         self.rspeed = 0
         
@@ -167,7 +167,7 @@ class MotorController:
         
         sleep(drivetime)
         
-    def sadiagonal(self, drivetime, inputspeed):
+    def sddiagonal(self, drivetime, inputspeed):
         self.fspeed = 0
         self.rspeed = 0
         
