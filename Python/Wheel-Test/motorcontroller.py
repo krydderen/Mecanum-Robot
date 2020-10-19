@@ -4,8 +4,8 @@ import RPi.GPIO as GPIO
 
 class MotorController:
     
-    __FULL_FORWARD    = [127  , 255]
-    __FULL_REVERSE    = [1    , 128]
+    __FULL_FORWARD    = [127  , 250]
+    __FULL_REVERSE    = [1    , 123]
     __FULL_STOP        = 0
     __HALF_FORWARD    = [98   , 225]
     __HALF_REVERSE    = [30   , 158]
@@ -31,8 +31,8 @@ class MotorController:
         
         if inputspeed   == 'HIGH':
             self.fspeed = self.__FULL_FORWARD
-            self.rspeed == self.__FULL_REVERSE
-        elif inputspeed == 'LOW': ##else istede frr elif??
+            self.rspeed = self.__FULL_REVERSE
+        elif inputspeed == 'LOW':
             self.fspeed = self.__HALF_FORWARD
             self.rspeed = self.__HALF_REVERSE
         
@@ -82,6 +82,31 @@ class MotorController:
         GPIO.output(24, GPIO.LOW)
         
         sleep(drivetime)
+    
+    def diagonal(self, drivetime, inputspeed):
+        self.fspeed = 0
+        
+        if inputspeed == 'HIGH':
+            self.fspeed = self.__FULL_FORWARD
+        elif inputspeed == 'LOW':
+            self.fspeed = self.__HALF_FORWARD        
+        
+        # Write forward for 1 and 2
+        GPIO.output(23, GPIO.HIGH)
+        #self.roboclaw.write(chr(self.fspeed[0]));
+        self.roboclaw.write(chr(self.fspeed[1]));
+        sleep(self.__MOTOR_WAIT_TIME)
+        GPIO.output(23, GPIO.LOW)
+        
+        # Write forward for 1 and 2
+        GPIO.output(24, GPIO.HIGH)
+        #self.roboclaw.write(chr(self.fspeed[0]));
+        self.roboclaw.write(chr(self.fspeed[1]));
+        sleep(self.__MOTOR_WAIT_TIME)
+        GPIO.output(24, GPIO.LOW)
+        
+        sleep(drivetime)
+    
     
     def forward(self, drivetime, inputspeed):
         self.fspeed = 0
