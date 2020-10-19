@@ -107,6 +107,30 @@ class MotorController:
         
         sleep(drivetime)
     
+    def fforward(self, drivetime = 1, inputspeed = 'LOW'):
+        self.fspeed = 0
+        
+        if inputspeed == 'HIGH':
+            self.fspeed = self.__FULL_FORWARD
+        elif inputspeed == 'LOW':
+            self.fspeed = self.__HALF_FORWARD        
+        
+        # Write forward for 1 and 2
+        GPIO.output(23, GPIO.HIGH)
+        self.roboclaw.write(chr(self.fspeed[0]));
+        self.roboclaw.write(chr(self.fspeed[1]));
+        sleep(self.__MOTOR_WAIT_TIME)
+        GPIO.output(23, GPIO.LOW)
+        
+        # Write forward for 1 and 2
+        GPIO.output(24, GPIO.HIGH)
+        self.roboclaw.write(chr(self.fspeed[0]));
+        self.roboclaw.write(chr(self.fspeed[1]));
+        sleep(self.__MOTOR_WAIT_TIME)
+        GPIO.output(24, GPIO.LOW)
+        
+        sleep(drivetime)
+        
     def backward(self, drivetime, inputspeed):
         self.rspeed = 0
         

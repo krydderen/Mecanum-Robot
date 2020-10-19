@@ -23,6 +23,7 @@ while run:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             run = False
+    keys = pygame.key.get_pressed
     
     if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_UP or event.key == ord('w'):
