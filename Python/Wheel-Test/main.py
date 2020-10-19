@@ -30,12 +30,16 @@ while run:
     
     if keys[pygame.K_w] and keys[pygame.K_d]:
         print('wd')
+        diagonals = True
     elif keys[pygame.K_w] and keys[pygame.K_a]:
         print('wa')
+        diagonals = True
     elif keys[pygame.K_s] and keys[pygame.K_d]:
         print('sd')
+        diagonals = True
     elif keys[pygame.K_s] and keys[pygame.K_a]:
         print('sa')
+        diagonals = True
         
         
     if event.type == pygame.KEYDOWN and diagonals != True:
