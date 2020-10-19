@@ -1,28 +1,34 @@
-  
-import io
-import socket
-import struct
-import time
-import picamera
-import sys
+import socket, cv2, pickle,struct
 
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-client_socket.connect((sys.argv[1], int(sys.argv[2])))
+# Socket Create
+server_socket = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+host_name  = socket.gethostname()
+host_ip = socket.gethostbyname(host_name)
+print('HOST IP:',host_ip)
+port = 9999
+socket_address = (host_ip,port)
 
-connection = client_socket.makefile('wb')
-try:
-    with picamera.PiCamera() as camera:
-        camera.resolution = (640, 480)
-	print("starting Camera...........")
-        time.sleep(2)
-        stream = io.BytesIO()        
-        for foo in camera.capture_continuous(stream, 'jpeg'):
-            connection.write(struct.pack('<L', stream.tell()))
-            connection.flush()
-            stream.seek(0)
-            connection.write(stream.read())
-            stream.seek(0)
-            stream.truncate()
-finally:
-    connection.close()
-    client_socket.close()
+# Socket Bind
+server_socket.bind(socket_address)
+
+# Socket Listen
+server_socket.listen(5)
+print("LISTENING AT:",socket_address)
+
+# Socket Accept
+while True:
+    client_socket,addr = server_socket.accept()
+    print('GOT CONNECTION FROM:',addr)
+    if client_socket:
+        vid = cv2.VideoCapture(0)
+        
+        while(vid.isOpened()):
+            img,frame = vid.read()
+            a = pickle.dumps(frame)
+            message = struct.pack("Q",len(a))+a
+            client_socket.sendall(message)
+            
+            cv2.imshow('TRANSMITTING VIDEO',frame)
+            key = cv2.waitKey(1) & 0xFF
+            if key ==ord('q'):
+                client_socket.close()
