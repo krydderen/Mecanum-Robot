@@ -21,10 +21,21 @@ while run:
     pygame.time.delay(25)
 
     for event in pygame.event.get():
-        if event.type == pygame.QUIT:
+        if event.type == pygame.QUIT or pygame.key.get_pressed()[pygame.K_q]:
             run = False
-    keys = pygame.key.get_pressed
     
+    keys = pygame.key.get_pressed()
+    
+    if keys[pygame.K_w] and keys[pygame.K_d]:
+        print('wd')
+    elif keys[pygame.K_w] and keys[pygame.K_a]:
+        print('wa')
+    elif keys[pygame.K_s] and keys[pygame.K_d]:
+        print('sd')
+    elif keys[pygame.K_s] and keys[pygame.K_a]:
+        print('sa')
+        
+        
     if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_UP or event.key == ord('w'):
             print('up')
