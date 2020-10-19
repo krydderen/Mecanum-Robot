@@ -26,6 +26,8 @@ class Server:
         self.rawCapture = PiRGBArray(self.camera, size =(640,480))
         time.sleep(0.1)
 
+
+# TESTING CODE
 if __name__ == '__main__':
     
     server = Server()
