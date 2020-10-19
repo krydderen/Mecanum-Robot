@@ -1,4 +1,5 @@
-  
+    """[summary]
+    """
 import io
 import socket
 import struct
@@ -26,3 +27,5 @@ try:
 finally:
     connection.close()
     client_socket.close()
+    socket.close()
+        
