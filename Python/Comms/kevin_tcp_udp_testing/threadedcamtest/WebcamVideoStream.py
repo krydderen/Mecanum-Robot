@@ -10,8 +10,8 @@ class CameraStream(object):
         # self.stream.set(3, 640)
         # self.stream.set(4, 480)
         
-        self.picamera = VideoStream(usePiCamera=True, resolution=(640,480),framerate=32).start()
-        (self.grabbed, self.frame) = self.stream.read()
+        self.stream = VideoStream(usePiCamera=True, resolution=(640,480),framerate=32).start()
+        self.frame = self.stream.read()
         self.started = False
         self.read_lock = Lock()
 
@@ -26,9 +26,9 @@ class CameraStream(object):
 
     def update(self):
         while self.started:
-            (grabbed, frame) = self.stream.read()
+            frame = self.stream.read()
             self.read_lock.acquire()
-            self.grabbed, self.frame = grabbed, frame
+            self.frame =frame
             self.read_lock.release()
 
     def read(self):
