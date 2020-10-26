@@ -5,6 +5,7 @@ import socket
 import struct
 from imutils.video import VideoStream
 import time
+from threading import Thread
 
 HEADER  = 4096
 PORT    = 8080
@@ -21,6 +22,6 @@ clientsocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 clientsocket.connect(ADDR)
 
 while True:
-    frame = picamera.read()
+    grabbed, frame = picamera.read()
     data = pickle.dumps(frame)
     clientsocket.sendall(struct.pack("i", len(data)) + data)
