@@ -5,7 +5,7 @@ import struct
 import sys
 import numpy as np
 
-HEADER  = 4096
+HEADER  = 131072
 PORT    = 8080
 FORMAT  = 'utf-8'
 SERVER  = socket.gethostbyname(socket.gethostname())
@@ -22,7 +22,7 @@ conn, addr = server.accept()
 
 data = b''
 
-payload_size = struct.calcsize("i")
+payload_size = struct.calcsize("L")
 
 while True:
     while len(data) < payload_size:
@@ -30,7 +30,7 @@ while True:
     packed_msg_size = data[:payload_size]
 
     data = data[payload_size:]
-    msg_size = struct.unpack("i", packed_msg_size)[0]
+    msg_size = struct.unpack("L", packed_msg_size)[0]
 
     while len(data) < msg_size:
         data += conn.recv(4096)

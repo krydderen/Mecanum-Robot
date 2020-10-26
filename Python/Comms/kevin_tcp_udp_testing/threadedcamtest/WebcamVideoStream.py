@@ -1,35 +1,45 @@
-from threading import Thread
+from threading import Thread, Lock
 from imutils.video import VideoStream
 
-class WebcamVideoStream:
-    def __init__(self,usePiCamera=True, resolution=(640,480), framerate=24):
-        # Initialize the video camera stream and read the first frame
-        # from the stream.
-        self.picamera = VideoStream(usePiCamera, resolution, framerate)
-        (self.grabbed, self.frame) = self.picamera.read()
+import cv2
+
+
+class CameraStream(object):
+    def __init__(self, src=0):
+        # self.stream = cv2.VideoCapture(src)
+        # self.stream.set(3, 640)
+        # self.stream.set(4, 480)
         
-        # Initialize the variable used to indicate if the thread should be stopped.
-        self.stopped = False
-        
+        self.picamera = VideoStream(usePiCamera=True, resolution=(640,480),framerate=32).start()
+        (self.grabbed, self.frame) = self.stream.read()
+        self.started = False
+        self.read_lock = Lock()
+
     def start(self):
-        # Start the thread to read frames from the VideoStream
-        Thread(target=self.update, args=()).start()
+        if self.started:
+            print("already started!!")
+            return None
+        self.started = True
+        self.thread = Thread(target=self.update, args=())
+        self.thread.start()
         return self
 
     def update(self):
-        # Keep the loop infinitly untill the thread is stopped        
-        while True:
-            # If the thread indicator variable is set, stop the frame
-            if self.stopped:
-                break
-        # Otherwise, read the next frame from the stream
-        (self.grabbed, self.frame) = self.picamera.read()
-        
+        while self.started:
+            (grabbed, frame) = self.stream.read()
+            self.read_lock.acquire()
+            self.grabbed, self.frame = grabbed, frame
+            self.read_lock.release()
+
     def read(self):
-        # Return the frame most recently read
-        return self.frame
-    
+        self.read_lock.acquire()
+        frame = self.frame.copy()
+        self.read_lock.release()
+        return frame
+
     def stop(self):
-        # Indicate that the thread should be stopped.
-        self.stopped = True
-        
+        self.started = False
+        self.thread.join()
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.stream.release()
