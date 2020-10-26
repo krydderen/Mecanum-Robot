@@ -12,7 +12,7 @@ def rungame(x, y, width, height, vel):
     run = True
     pygame.init()
     while run:
-        pygame.time.delay(10)
+        pygame.time.delay(100)
         
         currentevents = pygame.event.get()
         
@@ -24,14 +24,14 @@ def rungame(x, y, width, height, vel):
         
         move = False
         
-        # Change motor speed to high or low.
-        if keys[pygame.K_t]:
-            if drive_speed == 'LOW':
-                drive_speed = 'HIGH'
-                logging.debug('Drive speed is now HIGH')
-            elif drive_speed == 'HIGH':
-                drive_speed = 'LOW'
-                logging.debug('Drive speed is now LOW')   
+        # # Change motor speed to high or low.
+        # if keys[pygame.K_t]:
+        #     if drive_speed == 'LOW':
+        #         drive_speed = 'HIGH'
+        #         logging.debug('Drive speed is now HIGH')
+        #     elif drive_speed == 'HIGH':
+        #         drive_speed = 'LOW'
+        #         logging.debug('Drive speed is now LOW')   
         
         if (keys[pygame.K_w] and keys[pygame.K_d])   or (keys[pygame.K_UP] and keys[pygame.K_RIGHT]):
             logging.debug('wd')
