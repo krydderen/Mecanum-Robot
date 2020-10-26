@@ -4,12 +4,14 @@ import RPi.GPIO as GPIO
 
 class MotorController:
     
-    __FULL_FORWARD    = [127  , 250]
+    __FULL_FORWARD    = [127  , 255]
     __FULL_REVERSE    = [1    , 123]
     __FULL_STOP        = 0
     __HALF_FORWARD    = [98   , 225]
     __HALF_REVERSE    = [30   , 158]
     __MOTOR_WAIT_TIME   = 0.02
+    __FORWARD_SPEED   = []
+    __REVERSE_SPEED   = []
     
     def __init__(self):
         #Configure serial 
@@ -24,6 +26,18 @@ class MotorController:
         
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(slave_select_pins, GPIO.OUT, initial=GPIO.LOW)
+    
+    def speed_change(self, newspeed, ):
+        claw_forward = [65, 127, 193, 255] #min, max values for channel 1. min, max for channel 2 
+        claw_reverse = [63, 1, 193, 128]
+        claw_range = 62
+        minmax = [0,100]
+        minmax_range = minmax[1]-minmax[0]
+        __FORWARD_SPEED = [floor((((newspeed)*claw_range)/100)-claw_forward[0]),
+                           floor((((newspeed)*claw_range)/100)-claw_forward[2])]
+        __REVERSE_SPEED = [floor((((newspeed)*claw_range)/100)-claw_reverse[1]),
+                           floor((((newspeed)*claw_range)/100)-claw_reverse[3])]
+        
     
     def left(self, drivetime, inputspeed):
         self.fspeed = 0

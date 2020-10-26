@@ -4,7 +4,7 @@ pygame.init()
 
 
 win = pygame.display.set_mode((500,500))
-pygame.display.set_caption("First Game")
+pygame.display.set_caption("Mecanum controller")
 
 x = 50
 y = 50
@@ -46,15 +46,22 @@ while run:
         move = True; y += vel; x -= vel
         motor_controller.sadiagonal(drivetime = drive_time, inputspeed = drive_speed)
     
-    # Change motor speed to high or low.
+    # Change motorspeed of the robot.
     if keys[pygame.K_t]:
-        if drive_speed == 'LOW':
+        speed_premap = int(input("set speed from 0 to 100: "))
+        if not type(speed_premap) is int:
+            raise TypeError("Please only use integers for speed setting ")
+        elif (speed_premap < 0) or (speed_premap > 100):
+            raise ValueError("Speedrange is from 0 to 100: ")
+        motor_controller.speed_change(speed_premap)
+        
+        """ if drive_speed == 'LOW':
             drive_speed = 'HIGH'
             print('Drive speed is now HIGH')
         elif drive_speed == 'HIGH':
             drive_speed = 'LOW'
             print('Drive speed is now LOW')       
-        
+        """
         
     if event.type == pygame.KEYDOWN and move != True:
         if event.key == pygame.K_UP or event.key == ord('w'):
