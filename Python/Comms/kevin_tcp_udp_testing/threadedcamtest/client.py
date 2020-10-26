@@ -5,7 +5,7 @@ import time
 from threading import Thread
 from WebcamVideoStream import CameraStream
 
-HEADER  = 131072
+HEADER  = 4086
 PORT    = 8080
 FORMAT  = 'utf-8'
 SERVER  = '192.168.43.18'
