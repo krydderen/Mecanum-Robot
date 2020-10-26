@@ -10,7 +10,7 @@ class CameraStream(object):
         # self.stream.set(3, 256)
         # self.stream.set(4, 144)
         
-        self.stream = VideoStream(usePiCamera=True, resolution=(256,144),framerate=32).start()
+        self.stream = VideoStream(usePiCamera=True, resolution=(256,144),framerate=10).start()
         self.frame = self.stream.read()
         self.started = False
         self.read_lock = Lock()

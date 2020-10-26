@@ -4,6 +4,7 @@ import struct
 import time
 from threading import Thread
 from WebcamVideoStream import CameraStream
+import cv2
 
 HEADER  = 4086
 PORT    = 8080
@@ -22,8 +23,9 @@ clientsocket.connect(ADDR)
 while True:
     try:
         frame = cap.read()
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         data = pickle.dumps(frame)
-        clientsocket.sendall(struct.pack("L", len(data)) + data)
+        clientsocket.sendall(struct.pack("i", len(data)) + data)
     except Exception as e:
         print(f"[ERROR] Closing.. {e}")
         break

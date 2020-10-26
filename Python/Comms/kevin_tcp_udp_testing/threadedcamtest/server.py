@@ -21,6 +21,8 @@ print(f"[SERVER] Server is listening on {ADDR}.")
 
 conn, addr = server.accept()
 
+print(f"[NEW CONNECTION] {addr} connected.")
+
 data = b''
 
 payload_size = struct.calcsize("i")
