@@ -1,1 +1,0 @@
-https://stackoverflow.com/questions/59843149/how-to-read-frames-using-pyqt-and-opencv
