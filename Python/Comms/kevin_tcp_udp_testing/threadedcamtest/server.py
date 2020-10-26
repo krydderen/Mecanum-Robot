@@ -28,24 +28,30 @@ data = b''
 payload_size = struct.calcsize("i")
 
 while True:
-    while len(data) < payload_size:
-        data += conn.recv(HEADER)
-    packed_msg_size = data[:payload_size]
+    try:
+        conn.settimeout(5)
+        while len(data) < payload_size:
+            data += conn.recv(HEADER)
+        packed_msg_size = data[:payload_size]
 
-    data = data[payload_size:]
-    msg_size = struct.unpack("i", packed_msg_size)[0]
+        data = data[payload_size:]
+        msg_size = struct.unpack("i", packed_msg_size)[0]
 
-    while len(data) < msg_size:
-        data += conn.recv(HEADER)
-    frame_data = data[:msg_size]
-    data = data[msg_size:]
+        while len(data) < msg_size:
+            data += conn.recv(HEADER)
+        frame_data = data[:msg_size]
+        data = data[msg_size:]
 
-    frame=pickle.loads(frame_data)
-    print(frame.size)
-    cv2.namedWindow('frame',cv2.WINDOW_NORMAL)
-    cv2.resizeWindow('frame', 640,480)
-    cv2.imshow('frame', frame)
-    if cv2.waitKey(10) & 0xFF == ord('q'):
+        frame=pickle.loads(frame_data)
+        print(frame.size)
+        cv2.namedWindow('frame',cv2.WINDOW_NORMAL)
+        cv2.resizeWindow('frame', 640,480)
+        cv2.imshow('frame', frame)
+        if cv2.waitKey(10) & 0xFF == ord('q'):
+            break
+    except Exception as e:
+        
+        print(f"[ERROR] Closing.. {e}")
         break
     
 conn.close()

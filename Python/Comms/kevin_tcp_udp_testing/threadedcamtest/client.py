@@ -22,6 +22,7 @@ clientsocket.connect(ADDR)
 
 while True:
     try:
+        clientsocket.settimeout(5)
         frame = cap.read()
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         data = pickle.dumps(frame)
