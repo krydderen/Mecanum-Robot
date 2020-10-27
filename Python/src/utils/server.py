@@ -10,8 +10,8 @@ class Server(object):
         self.ADDR    = (self.SERVER,self.PORT)
         logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
         self.logger = logging.getLogger(__name__)
-        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)        
-        self.logger.info("[SERVER] Socket created.")    
+        self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.logger.info("[SERVER] Socket created.")
         self.server.bind(self.ADDR)
 
         self.data = b''
@@ -19,7 +19,6 @@ class Server(object):
         
     def handle_client(self, conn, addr):
         self.logger.info(f"[NEW CONNECTION] {addr} connected.")
-        
         while True:
             try:
                 conn.settimeout(5)
@@ -51,12 +50,15 @@ class Server(object):
     def start(self):
         self.server.listen(10)
         self.logger.info(f"Server is listening on {self.ADDR}")
+        conn, addr = self.server.accept()
         while True:
             try:
-                conn, addr = self.server.accept()
-                self.thread = Thread(target=self.handle_client, args=(conn, addr))
+                # self.thread = Thread(target=self.handle_client, args=(conn, addr), daemon=True)
+                self.thread = Thread(target=self.send, args=(conn, addr), daemon=True)
                 self.thread.start()
-                self.logger.info(f"[ACTIVE CONNECTIONS] {self.thread.active_count() - 1}")
+                # self.logger.debug("Handle Client thread started.")
+                self.logger.debug("Sendthread started.")
+                # self.logger.info(f"[ACTIVE CONNECTIONS] {self.threading.active_count() - 1}")
             except Exception as e:
                 self.logger.exception("Exception occured.")
                 break
@@ -64,3 +66,14 @@ class Server(object):
 
     def close(self):
         self.server.close()
+        
+    def send(self, conn, addr, message):
+        try:
+            # self.socket.settimeout(5)
+            data = pickle.dumps(message)
+            self.socket.sendall(struct.pack("i", len(data)) + data)
+            logging.info(f"Sent {message} to client.")
+        except Exception as e:
+            logging.exception(f"[ERROR] Failed to send message to client. \n {e}")
+            
+            
