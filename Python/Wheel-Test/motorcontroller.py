@@ -7,12 +7,12 @@ class MotorController:
     
     __FULL_FORWARD    = [127  , 255]
     __FULL_REVERSE    = [1    , 123]
-    __FULL_STOP        = 0
+    __FULL_STOP       =  0
     __HALF_FORWARD    = [98   , 225]
     __HALF_REVERSE    = [30   , 158]
-    __MOTOR_WAIT_TIME   = 0.02
-    __FORWARD_SPEED   = []
-    __REVERSE_SPEED   = []
+    __MOTOR_WAIT_TIME =  0.02
+    __FORWARD_SPEED   = [98   , 225]
+    __REVERSE_SPEED   = [30   , 158]
     
     def __init__(self):
         #Configure serial 
@@ -34,23 +34,14 @@ class MotorController:
         claw_range = 62
         minmax = [0,100]
         minmax_range = minmax[1]-minmax[0]
-        self.__FORWARD_SPEED = [(((newspeed)*claw_range)/100)+claw_forward[0],
-                                (((newspeed)*claw_range)/100)+claw_forward[2]]
-        self.__REVERSE_SPEED = [(((newspeed)*claw_range)/100)+claw_reverse[1],
-                                (((newspeed)*claw_range)/100)+claw_reverse[3]]
+        self.__FORWARD_SPEED = [(((newspeed)*claw_range)/minmax_range)+claw_forward[0],
+                                (((newspeed)*claw_range)/minmax_range)+claw_forward[2]]
+        self.__REVERSE_SPEED = [(((newspeed)*claw_range)/minmax_range)+claw_reverse[1],
+                                (((newspeed)*claw_range)/minmax_range)+claw_reverse[3]]
     
     def left(self, drivetime, inputspeed):
-        self.__FORWARD_SPEED
-        
-        self.fspeed = 0
-        self.rspeed = 0
-        
-        if inputspeed   == 'HIGH':
-            self.fspeed = self.__FULL_FORWARD
-            self.rspeed = self.__FULL_REVERSE
-        elif inputspeed == 'LOW':
-            self.fspeed = self.__HALF_FORWARD
-            self.rspeed = self.__HALF_REVERSE
+        self.fspeed = __FORWARD_SPEED
+        self.rspeed = __REVERSE_SPEED
         
         # REAR MOTOR 
         # Write forward for motor 1 and backward for motor 2
@@ -73,15 +64,8 @@ class MotorController:
         print(self.__FORWARD_SPEED)
 
     def right(self, drivetime, inputspeed):
-        self.fspeed = 0
-        self.rspeed = 0
-        
-        if inputspeed   == 'HIGH':
-            self.fspeed = self.__FULL_FORWARD
-            self.rspeed = self.__FULL_REVERSE
-        elif inputspeed == 'LOW':
-            self.fspeed = self.__HALF_FORWARD
-            self.rspeed = self.__HALF_REVERSE
+        self.fspeed = __FORWARD_SPEED
+        self.rspeed = __REVERSE_SPEED
         
         # REAR MOTOR
         # Write forward for motor 2 and backward for motor 1
@@ -102,18 +86,10 @@ class MotorController:
         sleep(drivetime)
     
     def wddiagonal(self, drivetime, inputspeed):
-        self.fspeed = 0
-        self.rspeed = 0
+        self.fspeed = __FORWARD_SPEED
+        self.rspeed = __REVERSE_SPEED
         
-        if inputspeed   == 'HIGH':
-            self.fspeed = self.__FULL_FORWARD
-            self.rspeed = self.__FULL_REVERSE
-        elif inputspeed == 'LOW':
-            self.fspeed = self.__HALF_FORWARD
-            self.rspeed = self.__HALF_REVERSE       
-        
-        
-         # REAR MOTOR
+        # REAR MOTOR
         # Write forward for motor 2 
         GPIO.output(23, GPIO.HIGH)
         self.roboclaw.write(chr(self.fspeed[1]));
@@ -130,18 +106,10 @@ class MotorController:
         sleep(drivetime)
         
     def wadiagonal(self, drivetime, inputspeed):
-        self.fspeed = 0
-        self.rspeed = 0
+        self.fspeed = __FORWARD_SPEED
+        self.rspeed = __REVERSE_SPEED
         
-        if inputspeed   == 'HIGH':
-            self.fspeed = self.__FULL_FORWARD
-            self.rspeed = self.__FULL_REVERSE
-        elif inputspeed == 'LOW':
-            self.fspeed = self.__HALF_FORWARD
-            self.rspeed = self.__HALF_REVERSE       
-        
-        
-         # REAR MOTOR
+        # REAR MOTOR
         # Write forward for motor 2 
         GPIO.output(23, GPIO.HIGH)
         self.roboclaw.write(chr(self.fspeed[0]));
@@ -158,18 +126,10 @@ class MotorController:
         sleep(drivetime)
         
     def sadiagonal(self, drivetime, inputspeed):
-        self.fspeed = 0
-        self.rspeed = 0
+        self.fspeed = __FORWARD_SPEED
+        self.rspeed = __REVERSE_SPEED
         
-        if inputspeed   == 'HIGH':
-            self.fspeed = self.__FULL_FORWARD
-            self.rspeed = self.__FULL_REVERSE
-        elif inputspeed == 'LOW':
-            self.fspeed = self.__HALF_FORWARD
-            self.rspeed = self.__HALF_REVERSE       
-        
-        
-         # REAR MOTOR
+        # REAR MOTOR
         # Write forward for motor 2 
         GPIO.output(23, GPIO.HIGH)
         self.roboclaw.write(chr(self.rspeed[1]));
@@ -186,18 +146,10 @@ class MotorController:
         sleep(drivetime)
         
     def sddiagonal(self, drivetime, inputspeed):
-        self.fspeed = 0
-        self.rspeed = 0
+        self.fspeed = __FORWARD_SPEED
+        self.rspeed = __REVERSE_SPEED
         
-        if inputspeed   == 'HIGH':
-            self.fspeed = self.__FULL_FORWARD
-            self.rspeed = self.__FULL_REVERSE
-        elif inputspeed == 'LOW':
-            self.fspeed = self.__HALF_FORWARD
-            self.rspeed = self.__HALF_REVERSE       
-        
-        
-         # REAR MOTOR
+        # REAR MOTOR
         # Write forward for motor 2 
         GPIO.output(23, GPIO.HIGH)
         self.roboclaw.write(chr(self.rspeed[0]));
@@ -215,12 +167,7 @@ class MotorController:
     
 
     def forward(self, drivetime, inputspeed):
-        self.fspeed = 0
-        
-        if inputspeed == 'HIGH':
-            self.fspeed = self.__FULL_FORWARD
-        elif inputspeed == 'LOW':
-            self.fspeed = self.__HALF_FORWARD        
+        self.fspeed = __FORWARD_SPEED
         
         # Write forward for 1 and 2
         GPIO.output(23, GPIO.HIGH)
@@ -263,12 +210,7 @@ class MotorController:
         sleep(drivetime)
         
     def backward(self, drivetime, inputspeed):
-        self.rspeed = 0
-        
-        if inputspeed == 'HIGH':
-            self.rspeed = self.__FULL_REVERSE
-        elif inputspeed == 'LOW':
-            self.rspeed = self.__HALF_REVERSE
+        self.rspeed = __REVERSE_SPEED
         
         # Write backward for 1 and 2
         GPIO.output(23, GPIO.HIGH)
@@ -297,17 +239,8 @@ class MotorController:
         self.stop_controller(slave_select_pins[1])
 
     def rotate(self, drivetime, direction, inputspeed):
-        self.fspeed = 0
-        self.rspeed = 0
-        
-        if inputspeed   == 'HIGH':
-            self.fspeed = self.__FULL_FORWARD
-            self.rspeed = self.__FULL_REVERSE
-        elif inputspeed == 'LOW':
-            self.fspeed = self.__HALF_FORWARD
-            self.rspeed = self.__HALF_REVERSE
-        else:
-            print('kys')
+        self.fspeed = __FORWARD_SPEED
+        self.rspeed = __REVERSE_SPEED
         
         if direction == 'CLOCKWISE':
             # REAR MOTOR left motor forward and right motor backward
