@@ -57,19 +57,19 @@ class Server(object):
             logging.debug("connection accepted.")
             self.connected = True
             logging.debug("self.connected = True.")
-            
-            try:
-                self.thread = Thread(target=self.handle_client, args=(conn, addr), daemon=True)
-                self.thread.name = "Handle Client Thread"
-                # self.thread = Thread(target=self.send, args=(conn, addr), daemon=True)
-                self.thread.start()
-                self.logger.debug("Handle Client thread started.")
-                # self.logger.debug("Sendthread started.")
-                # self.logger.info(f"[ACTIVE CONNECTIONS] {self.threading.active_count() - 1}")
-            except Exception as e:
-                self.logger.exception("Exception occured.")
-                self.close()
-                break
+            self.handle_client(conn, addr)
+            # try:
+            #     self.thread = Thread(target=self.handle_client, args=(conn, addr), daemon=True)
+            #     self.thread.name = "Handle Client Thread"
+            #     # self.thread = Thread(target=self.send, args=(conn, addr), daemon=True)
+            #     self.thread.start()
+            #     self.logger.debug("Handle Client thread started.")
+            #     # self.logger.debug("Sendthread started.")
+            #     # self.logger.info(f"[ACTIVE CONNECTIONS] {self.threading.active_count() - 1}")
+            # except Exception as e:
+            #     self.logger.exception("Exception occured.")
+            #     self.close()
+            #     break
     
 
     def close(self):
