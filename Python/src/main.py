@@ -27,8 +27,8 @@ def rungame(queue, events):
         run = True
         pygame.init()
         while run:
-            # connected = server.isconnected()
-            connected = False
+            connected = server.isconnected()
+            # connected = False
             logging.debug(f"Server connection: {server.isconnected()}")
             # if server.isconnected():
             #     connected = True
@@ -149,7 +149,7 @@ def rungame(queue, events):
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s - %(message)s',
-                        level=logging.DEBUG)
+                        level=logging.INFO)
 
     server = Server()
 

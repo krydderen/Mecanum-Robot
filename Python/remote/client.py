@@ -68,8 +68,8 @@ class Client(object):
             """
             while True:
                 data = self.socket.recv(self.HEADER) # ! Wait for this?
-                
-                logging.debug(f"Server sent data: {data}")
+                msg = pickle.loads(data)
+                logging.info(f"Server sent data: {msg}")
                 
                 # if not data:
                     # return
@@ -79,7 +79,8 @@ class Client(object):
 
 
 if __name__ == '__main__':
-    logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.DEBUG)
+    logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S',
+                        level=logging.INFO)
     logging.debug("Started program")
     client = Client()
     logging.debug("Created Client")

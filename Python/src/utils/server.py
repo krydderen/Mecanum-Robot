@@ -15,6 +15,8 @@ class Server(object):
         self.server.bind(self.ADDR)
         self.connected = False
         self.payload_size = struct.calcsize("L")
+        self.conn = ''
+        self.addr = ''
         
     def handle_client(self, conn, addr):
         self.logger.info(f"[NEW CONNECTION] {addr} connected.")
@@ -36,7 +38,7 @@ class Server(object):
                 data = data[msg_size:]
 
                 frame=pickle.loads(frame_data)
-                print(frame.size)
+                logging.debug(frame.size)
                 cv2.namedWindow('frame',cv2.WINDOW_NORMAL)
                 cv2.resizeWindow('frame', 640,480)
                 cv2.imshow('frame', frame)
@@ -55,11 +57,11 @@ class Server(object):
         while not event.is_set():
             self.server.listen(10)
             self.logger.info(f"Server is listening on {self.ADDR}")
-            conn, addr = self.server.accept()
+            self.conn, self.addr = self.server.accept()
             logging.debug("connection accepted.")
             self.connected = True
             logging.debug("self.connected = True.")
-            self.handle_client(conn, addr)
+            self.handle_client(self.conn, self.addr)
             # try:
             #     self.thread = Thread(target=self.handle_client, args=(conn, addr), daemon=True)
             #     self.thread.name = "Handle Client Thread"
@@ -86,11 +88,11 @@ class Server(object):
         try:
             # self.socket.settimeout(5)
             senddata = pickle.dumps(message)
-            self.socket.sendall(struct.pack("L", len(senddata)) + senddata)
-            logging.debug(f"Sent {message} to client.")
+            self.conn.sendall(senddata)
+            logging.info(f"Sent {message} to client.")
         except Exception as e:
             logging.exception(f"[ERROR] Failed to send message to client. \n {e}")
-            self.close()
+            # self.close()
             
             
             
