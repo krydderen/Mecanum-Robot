@@ -6,12 +6,12 @@ import cv2
 
 class CameraStream(object):
     def __init__(self, src=0):
-        # self.stream = cv2.VideoCapture(src)
-        # self.stream.set(3, 256)
-        # self.stream.set(4, 144)
+        self.stream = cv2.VideoCapture(src)
+        self.stream.set(3, 256)
+        self.stream.set(4, 144)
         
-        self.stream = VideoStream(usePiCamera=True, resolution=(256,144),framerate=10).start()
-        self.frame = self.stream.read()
+        # self.stream = VideoStream(usePiCamera=True, resolution=(256,144),framerate=10).start()
+        _, self.frame = self.stream.read()
         self.started = False
         self.read_lock = Lock()
 
@@ -21,14 +21,15 @@ class CameraStream(object):
             return None
         self.started = True
         self.thread = Thread(target=self.update, args=(), daemon=True)
+        self.thread.name = "Camera Update Thread"
         self.thread.start()
         return self
 
     def update(self):
         while self.started:
-            frame = self.stream.read()
+            # grabbed, frame = self.stream.read()
             self.read_lock.acquire()
-            self.frame =frame
+            _, self.frame = self.stream.read()
             self.read_lock.release()
 
     def read(self):

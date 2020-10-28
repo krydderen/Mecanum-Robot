@@ -18,6 +18,7 @@ def rungame(queue, events):
         drive_time = 0.2
         drive_speed = 'LOW'
         connected = False
+        stopped = False
         run = True
         pygame.init()
         while run:
@@ -25,8 +26,7 @@ def rungame(queue, events):
             # if server.isconnected():
             #     connected = True
             
-            
-            pygame.time.delay(100)
+            pygame.time.delay(1000)
             
             currentevents = pygame.event.get()
             
@@ -37,7 +37,7 @@ def rungame(queue, events):
             keys = pygame.key.get_pressed()
             
             move = False
-            stopped = False
+            
             # # Change motor speed to high or low.
             # if keys[pygame.K_t]:
             #     if drive_speed == 'LOW':
