@@ -13,7 +13,7 @@ class Server(object):
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.logger.info("[SERVER] Socket created.")
         self.server.bind(self.ADDR)
-
+        self.connected = False
         self.data = b''
         self.payload_size = struct.calcsize("i")
         
@@ -47,26 +47,34 @@ class Server(object):
                 break    
         conn.close()     
         
-    def start(self):
-        self.server.listen(10)
-        self.logger.info(f"Server is listening on {self.ADDR}")
-        conn, addr = self.server.accept()
-        while True:
-            try:
-                # self.thread = Thread(target=self.handle_client, args=(conn, addr), daemon=True)
-                self.thread = Thread(target=self.send, args=(conn, addr), daemon=True)
-                self.thread.start()
-                # self.logger.debug("Handle Client thread started.")
-                self.logger.debug("Sendthread started.")
-                # self.logger.info(f"[ACTIVE CONNECTIONS] {self.threading.active_count() - 1}")
-            except Exception as e:
-                self.logger.exception("Exception occured.")
-                break
-        self.server.close()
+    def start(self, queue, event):
+        while not event.is_set():
+            self.server.listen(10)
+            self.logger.info(f"Server is listening on {self.ADDR}")
+            conn, addr = self.server.accept()
+            logging.debug("connection accepted.")
+            self.connected = True
+            logging.debug("self.connected = True.")
+            while True:
+                try:
+                    # self.thread = Thread(target=self.handle_client, args=(conn, addr), daemon=True)
+                    self.thread = Thread(target=self.send, args=(conn, addr), daemon=True)
+                    self.thread.start()
+                    # self.logger.debug("Handle Client thread started.")
+                    self.logger.debug("Sendthread started.")
+                    # self.logger.info(f"[ACTIVE CONNECTIONS] {self.threading.active_count() - 1}")
+                except Exception as e:
+                    self.logger.exception("Exception occured.")
+                    break
+            self.server.close()
 
     def close(self):
+        self.thread.join()
         self.server.close()
-        
+    
+    def isconnected(self):
+        return self.connected
+    
     def send(self, conn, addr, message):
         try:
             # self.socket.settimeout(5)
