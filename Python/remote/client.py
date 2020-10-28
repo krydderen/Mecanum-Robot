@@ -1,4 +1,5 @@
 import pickle, socket, struct, time, logging, threading, queue
+import numpy as np
 import cv2
 from WebcamVideoStream import CameraStream
 from concurrent.futures import ThreadPoolExecutor
@@ -16,6 +17,7 @@ class Client(object):
         self.ADDR    = (self.SERVER,self.PORT)
         self.socket  = None
         self.connected = False
+        
     
         logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
         self.logger = logging.getLogger(__name__)
@@ -23,7 +25,11 @@ class Client(object):
     def start(self):
         self.logger.info("Starting camera...")
         self.logger.debug(f"SERVER - {self.ADDR}")
-        self.cap = CameraStream().start()
+        # self.cap = CameraStream().start()
+        self.cap = cv2.VideoCapture(0)
+        self.cap.set(3, 256)
+        self.cap.set(4, 144)
+        _,self.frame=self.cap.read()
         time.sleep(1)
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect(self.ADDR)
@@ -31,17 +37,20 @@ class Client(object):
         self.logger.info(f"Successfully connected to {self.ADDR}")
 
     def disconnect(self):
+        self.connected = False
         self.socket.close()
         self.cap.stop()
         self.logger.info(f"Successfully disconnected from {self.ADDR}")
 
     def handle_send(self, queue, event):
         while not event.is_set():
-            while True:
+            while self.connected:
                 try:
                     # self.socket.settimeout(5)
-                    frame = self.cap.read()
-                    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+                    logging.debug("Reading frame..")
+                    cv2.waitKey(100) #delay
+                    _,self.frame = self.cap.read()
+                    frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
                     data = pickle.dumps(frame)
                     self.socket.sendall(struct.pack("L", len(data)) + data)
                     logging.debug(f"sent: {len(data)}")
@@ -73,7 +82,7 @@ if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.DEBUG)
     logging.debug("Started program")
     client = Client()
-    logging.debug("Crated Client")
+    logging.debug("Created Client")
     client.start()
     logging.debug("Started Client")
     

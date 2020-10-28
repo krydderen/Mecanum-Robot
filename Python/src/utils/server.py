@@ -21,7 +21,7 @@ class Server(object):
         data = b''
         while True:
             try:
-                conn.settimeout(30)
+                conn.settimeout(10)
                 while len(data) < self.payload_size:
                     data += conn.recv(self.HEADER)
                 packed_msg_size = data[:self.payload_size]
@@ -41,12 +41,14 @@ class Server(object):
                 cv2.resizeWindow('frame', 640,480)
                 cv2.imshow('frame', frame)
                 if cv2.waitKey(10) & 0xFF == ord('q'):
+                    cv2.destroyAllWindows()
+                    conn.close()
                     break
                 
             except Exception as e:
                 self.logger.info(f"[ERROR] Closing.. {e}")
                 self.logger.debug(f"[DEBUG] {e.with_traceback()}")
-                # break    
+                break    
         conn.close()     
         
     def start(self, queue, event):
@@ -73,8 +75,8 @@ class Server(object):
     
 
     def close(self):
-        self.connected = False
         self.thread.join()
+        self.connected = False
         self.server.close()
     
     def isconnected(self):
