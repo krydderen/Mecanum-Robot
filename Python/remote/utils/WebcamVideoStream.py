@@ -1,17 +1,19 @@
 from threading import Thread, Lock
 from imutils.video import VideoStream
-
 import cv2
-
 
 class CameraStream(object):
     def __init__(self, src=0):
-        self.stream = cv2.VideoCapture(src)
-        self.stream.set(3, 256)
-        self.stream.set(4, 144)
+        # ! Uncomment this for testing on Windows.
+        # self.stream = cv2.VideoCapture(src)
+        # self.stream.set(3, 256)
+        # self.stream.set(4, 144)
+        # _, self.frame = self.stream.read()
         
-        # self.stream = VideoStream(usePiCamera=True, resolution=(256,144),framerate=10).start()
-        _, self.frame = self.stream.read()
+        # * Uncomment this for testing on RPI.
+        self.stream = VideoStream(usePiCamera=True, resolution=(256,144),framerate=10).start()
+        self.frame = self.stream.read()
+        
         self.started = False
         self.read_lock = Lock()
 
@@ -27,9 +29,14 @@ class CameraStream(object):
 
     def update(self):
         while self.started:
-            # grabbed, frame = self.stream.read()
             self.read_lock.acquire()
-            _, self.frame = self.stream.read()
+            
+            # ! Uncomment this for testing on Windows.
+            # _, self.frame = self.stream.read()
+            
+            # * Uncomment this for testing on RPI.
+            self.frame = self.stream.read()
+            
             self.read_lock.release()
 
     def read(self):
