@@ -161,8 +161,8 @@ if __name__ == '__main__':
         executor.submit(rungame, pipeline, event)
         executor.submit(server.start, pipeline, event)
 
-    # server.start()
     # server  = server()
+    # server.start()
     # serverthread = Theread(target=server.start(), args=(), daemon = True)
     # gamethread = Thread(target=rungame(), args=(), daemon=True)
 
