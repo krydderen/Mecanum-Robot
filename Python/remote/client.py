@@ -1,7 +1,7 @@
 import pickle, socket, struct, time, logging, threading, queue
 import numpy as np
 import cv2
-# from .utils.motorcontroller import MotorController
+from utils.motorcontroller import MotorController
 from concurrent.futures import ThreadPoolExecutor
 
 class Client(object):
@@ -21,7 +21,7 @@ class Client(object):
         self.COMMANDS = ['w','a','s','d','wd','wa','sd','sa','q','e']
         # - - - - Initialize motor controller - - - - -
         self.drivetime = 0.2
-        # self.moco = MotorController()
+        self.moco = MotorController()
 
     def start(self):
         self.logger.info("Starting camera...")
@@ -74,36 +74,36 @@ class Client(object):
                 if msg in self.COMMANDS:
                     if msg == 'w':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        # self.moco.forward(self.drivetime)
+                        self.moco.forward(self.drivetime)
                     elif msg == 'a':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        # self.moco.left(self.drivetime)
+                        self.moco.left(self.drivetime)
                     elif msg == 's':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        # self.moco.backward(self.drivetime)
+                        self.moco.backward(self.drivetime)
                     elif msg == 'd':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        # self.moco.right(self.drivetime)
+                        self.moco.right(self.drivetime)
                     elif msg == 'wd':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        # self.moco.wddiagonal(self.drivetime)
+                        self.moco.wddiagonal(self.drivetime)
                     elif msg == 'wa':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        # self.moco.wadiagonal(self.drivetime)
+                        self.moco.wadiagonal(self.drivetime)
                     elif msg == 'sd':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        # self.moco.sddiagonal(self.drivetime)
+                        self.moco.sddiagonal(self.drivetime)
                     elif msg == 'sa':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        # self.moco.sadiagonal(self.drivetime)
+                        self.moco.sadiagonal(self.drivetime)
                     elif msg == 'q':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        # self.moco.rotate(direction = 'COUNTER_CLOCKWISE',
-                                        #  drive_time = self.drivetime)
+                        self.moco.rotate(direction = 'COUNTER_CLOCKWISE',
+                                        drive_time = self.drivetime)
                     elif msg == 'e':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        # self.moco.rotate(direction = 'CLOCKWISE',
-                                        #  drive_time = self.drivetime)
+                        self.moco.rotate(direction = 'CLOCKWISE',
+                                        drive_time = self.drivetime)
 
 
 if __name__ == '__main__':
