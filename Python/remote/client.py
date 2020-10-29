@@ -74,36 +74,36 @@ class Client(object):
                 if msg in self.COMMANDS:
                     if msg == 'w':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.moco.forward(self.drivetime)
+                        self.moco.forward(self.drivetime, inputspeed = 'LOW')
                     elif msg == 'a':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.moco.left(self.drivetime)
+                        self.moco.left(self.drivetime, inputspeed = 'LOW')
                     elif msg == 's':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.moco.backward(self.drivetime)
+                        self.moco.backward(self.drivetime, inputspeed = 'LOW')
                     elif msg == 'd':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.moco.right(self.drivetime)
+                        self.moco.right(self.drivetime, inputspeed = 'LOW')
                     elif msg == 'wd':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.moco.wddiagonal(self.drivetime)
+                        self.moco.wddiagonal(self.drivetime, inputspeed = 'LOW')
                     elif msg == 'wa':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.moco.wadiagonal(self.drivetime)
+                        self.moco.wadiagonal(self.drivetime, inputspeed = 'LOW')
                     elif msg == 'sd':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.moco.sddiagonal(self.drivetime)
+                        self.moco.sddiagonal(self.drivetime, inputspeed = 'LOW')
                     elif msg == 'sa':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.moco.sadiagonal(self.drivetime)
+                        self.moco.sadiagonal(self.drivetime, inputspeed = 'LOW')
                     elif msg == 'q':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         self.moco.rotate(direction = 'COUNTER_CLOCKWISE',
-                                        drive_time = self.drivetime)
+                                        drive_time = self.drivetime, inputspeed = 'LOW')
                     elif msg == 'e':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         self.moco.rotate(direction = 'CLOCKWISE',
-                                        drive_time = self.drivetime)
+                                        drive_time = self.drivetime, inputspeed = 'LOW')
 
 
 if __name__ == '__main__':
