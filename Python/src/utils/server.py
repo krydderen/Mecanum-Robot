@@ -87,8 +87,8 @@ class Server(object):
     def send(self, message):
         try:
             # self.socket.settimeout(5)
-            senddata = pickle.dump(message)
-            self.conn.sendall(senddata)
+            senddata = pickle.dumps(message)
+            self.conn.send(senddata)
             logging.info(f"Sent {message} to client.")
         except Exception as e:
             logging.exception(f"[ERROR] Failed to send message to client. \n {e}")
