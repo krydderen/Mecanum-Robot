@@ -41,6 +41,7 @@ class Server(object):
                 logging.debug(frame.size)
                 cv2.namedWindow('frame',cv2.WINDOW_NORMAL)
                 cv2.resizeWindow('frame', 640,480)
+                # cv2.resizeWindow('frame', 1920,1080)
                 cv2.imshow('frame', frame)
                 if cv2.waitKey(10) & 0xFF == ord('q'):
                     cv2.destroyAllWindows()
