@@ -6,8 +6,8 @@ import threading
 import Queue as queue
 import numpy as np
 import cv2
-from utils.motorcontroller import MotorController
-import concurrent.futures
+from utils.motorcontroller import *
+from multiprocessing.pool import ThreadPool
 
 
 class Client(object):
@@ -139,11 +139,25 @@ if __name__ == '__main__':
     client.start()
     print("Started Client")
 
-    pipeline = queue.Queue(maxsize=5)
-    event = threading.Event()
-    with concurrent.futures.ThreadPoolExecutor(max_workers=2) as executor:
-        executor.submit(client.handle_read, pipeline, event)
-        executor.submit(client.handle_send, pipeline, event)
+    thread_count = 2
+    thread_pool = ThreadPool(processes=thread_count)
+    known_threads = {}
+    
+    
+    thread_pool.apply_async(client.handle_read, args=())
+    thread_pool.apply_async(client.handle_send, args=())
+    
+    thread_pool.close()
+    thread_pool.join()
+    
+    print("im dead")
+
+    # * v - - - - Python 3 - - - - v
+    # pipeline = queue.Queue(maxsize=5)
+    # event = threading.Event()
+    # with ThreadPoolExecutor(max_workers=2) as executor:
+    #     executor.submit(client.handle_read, pipeline, event)
+    #     executor.submit(client.handle_send, pipeline, event)
 
     # sendthread = Thread(target=client.handle_send, args=(), daemon=True)
     # readthread = Thread(target=client.handle_read, args=(), daemon=True)
