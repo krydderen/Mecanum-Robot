@@ -1,3 +1,18 @@
 {
-    "python.pythonPath": "C:\\Users\\Peter\\anaconda3\\python.exe"
+    "python.pythonPath": "C:\\Users\\Peter\\anaconda3\\python.exe",
+    "python.linting.enabled": true,
+    "python.testing.pytestArgs": [
+        "Threading"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.nosetestsEnabled": false,
+    "python.testing.pytestEnabled": false,
+    "python.testing.unittestArgs": [
+        "-v",
+        "-s",
+        "./Python",
+        "-p",
+        "*test.py"
+    ],
+    "python.testing.promptToConfigure": false
 }
