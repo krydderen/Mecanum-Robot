@@ -206,6 +206,7 @@ class MotorController:
         elif inputspeed == 'LOW':
             self.fspeed = self.__HALF_FORWARD        
         
+        print("[MOCO] set speed ")
         # Write forward for 1 and 2
         GPIO.output(23, GPIO.HIGH)
         self.roboclaw.write(chr(self.fspeed[0]));
@@ -213,6 +214,8 @@ class MotorController:
         sleep(self.__MOTOR_WAIT_TIME)
         GPIO.output(23, GPIO.LOW)
         
+        
+        print("[MOCO] first mc ")
         # Write forward for 1 and 2
         GPIO.output(24, GPIO.HIGH)
         self.roboclaw.write(chr(self.fspeed[0]));
@@ -220,6 +223,10 @@ class MotorController:
         sleep(self.__MOTOR_WAIT_TIME)
         GPIO.output(24, GPIO.LOW)
         
+        
+        print("[MOCO] second mc ")
+        
+        print("[MOCO] driving ")
         sleep(drivetime)
     
     def fforward(self, drivetime = 1, inputspeed = 'LOW'):

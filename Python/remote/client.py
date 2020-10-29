@@ -29,7 +29,7 @@ class Client(object):
         self.COMMANDS = ['w', 'a', 's', 'd', 'wd',
                          'wa', 'sd', 'sa', 'q', 'e', 'stop']
         # - - - - Initialize motor controller - - - - -
-        self.drivetime = 0.2
+        # self.drivetime = 0.2
         self.moco = MotorController()
 
     def start(self):
@@ -87,47 +87,47 @@ class Client(object):
                     if msg == 'w':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         self.moco.forward(
-                            drivetime=self.drivetime, inputspeed='LOW')
+                            drivetime=0.2, inputspeed='LOW')
                         logging.debug(f"Sent command to MOCO. |{msg}| ")
                     elif msg == 'a':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.moco.left(drivetime=self.drivetime,
+                        self.moco.left(drivetime=0.2,
                                        inputspeed='LOW')
                         logging.debug(f"Sent command to MOCO. |{msg}| ")
                     elif msg == 's':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         self.moco.backward(
-                            drivetime=self.drivetime, inputspeed='LOW')
+                            drivetime=0.2, inputspeed='LOW')
                         logging.debug(f"Sent command to MOCO. |{msg}| ")
                     elif msg == 'd':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         self.moco.right(
-                            drivetime=self.drivetime, inputspeed='LOW')
+                            drivetime=0.2, inputspeed='LOW')
                         logging.debug(f"Sent command to MOCO. |{msg}| ")
                     elif msg == 'wd':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         self.moco.wddiagonal(
-                            drivetime=self.drivetime, inputspeed='LOW')
+                            drivetime=0.2, inputspeed='LOW')
                     elif msg == 'wa':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         self.moco.wadiagonal(
-                            drivetime=self.drivetime, inputspeed='LOW')
+                            drivetime=0.2, inputspeed='LOW')
                     elif msg == 'sd':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         self.moco.sddiagonal(
-                            drivetime=self.drivetime, inputspeed='LOW')
+                            drivetime=0.2, inputspeed='LOW')
                     elif msg == 'sa':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         self.moco.sadiagonal(
-                            drivetime=self.drivetime, inputspeed='LOW')
+                            drivetime=0.2, inputspeed='LOW')
                     elif msg == 'q':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         self.moco.rotate(direction='COUNTER_CLOCKWISE',
-                                         drivetime=self.drivetime, inputspeed='LOW')
+                                         drivetime=0.2, inputspeed='LOW')
                     elif msg == 'e':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         self.moco.rotate(direction='CLOCKWISE',
-                                         drivetime=self.drivetime, inputspeed='LOW')
+                                         drivetime=0.2, inputspeed='LOW')
                     elif msg == 'stop':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         self.moco.stop()
