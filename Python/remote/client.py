@@ -70,7 +70,9 @@ class Client(object):
                 data = self.socket.recv(self.HEADER) # ! Wait for this?
                 msg = pickle.loads(data)
                 logging.info(f"Server sent data: {msg}")
-                
+                logging.info(f"data: {data}")
+                logging.info(f"msg: {msg}")
+                logging.info(f"bmsg: {msg.decode(self.FORMAT)}")
                 try:
                     if msg in self.COMMANDS:
                         if msg == 'w':
