@@ -119,18 +119,20 @@ def rungame(queue, events):
                 move = True
                 if connected:
                     server.send('q')
-                # mc.rotate(direction = 'COUNTER_CLOCKWISE',drivetime = drive_time, inputspeed = drive_speed)
+                # mc.rotate(direction = 'COUNTER_CLOCKWISE',drivetime = drive_time,
+                        #   inputspeed = drive_speed)
             elif keys[pygame.K_e]:
                 logging.debug('clockwise')
                 move = True
                 if connected:
                     server.send('e')
-                # mc.rotate(direction = 'CLOCKWISE',drivetime = drive_time, inputspeed = drive_speed)
+                # mc.rotate(direction = 'CLOCKWISE',drivetime = drive_time,
+                        #   inputspeed = drive_speed)
 
-            if move == False and stopped == False:
+            if move == False and stopped == False: 
                 # mc.stop()
                 if connected:
-                    server.send('stop')
+                    server.send('stop') 
                 stopped = True
                 pass
             else:
