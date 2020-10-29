@@ -68,7 +68,7 @@ class Client(object):
             """
             while True:
                 data = self.socket.recv(self.HEADER) # ! Wait for this?
-                msg = pickle.loads(data)
+                msg = pickle.load(data)
                 logging.info(f"Server sent data: {msg}")
                 
                 try:
