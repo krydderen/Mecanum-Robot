@@ -36,10 +36,17 @@ class MotorController(object):
         claw_range = 62
         minmax = [0,100]
         minmax_range = minmax[1]-minmax[0]
+        if newspeed == 0:
+            self.__FORWARD_SPEED = [0, 0]
+            self.__REVERSE_SPEED = [0, 0]
+            return
+        elif newspeed in range(1,9):
+            newspeed = 10
+            
         self.__FORWARD_SPEED = [(((newspeed)*claw_range)/minmax_range)+claw_forward[0],
-                                (((newspeed)*claw_range)/minmax_range)+claw_forward[2]]
+                                    (((newspeed)*claw_range)/minmax_range)+claw_forward[2]]
         self.__REVERSE_SPEED = [(((-newspeed)*claw_range)/minmax_range)+claw_reverse[0],
-                                (((-newspeed)*claw_range)/minmax_range)+claw_reverse[2]]
+                                    (((-newspeed)*claw_range)/minmax_range)+claw_reverse[2]]
         
         print(self.__FORWARD_SPEED)
         print(self.__REVERSE_SPEED)
@@ -65,8 +72,6 @@ class MotorController(object):
         GPIO.output(24, GPIO.LOW)
         
         sleep(drivetime)
-        
-        print(self.__FORWARD_SPEED)
 
     def right(self, drivetime, inputspeed):
         self.fspeed = self.__FORWARD_SPEED
