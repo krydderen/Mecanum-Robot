@@ -1,24 +1,33 @@
-import pickle, socket, struct, time, logging, threading, queue
+import pickle
+import socket
+import struct
+import time
+import logging
+import threading
+import queue
 import numpy as np
 import cv2
 from utils.motorcontroller import *
 from concurrent.futures import ThreadPoolExecutor
 
+
 class Client(object):
     def __init__(self):
-        self.HEADER  = 4086
-        self.PORT    = 8080
-        self.FORMAT  = 'utf-8'
-        self.SERVER  = '192.168.43.18'
+        self.HEADER = 4086
+        self.PORT = 8080
+        self.FORMAT = 'utf-8'
+        self.SERVER = '192.168.43.18'
         # self.SERVER  = socket.gethostbyname(socket.gethostname())
-        self.ADDR    = (self.SERVER,self.PORT)
-        self.socket  = None
+        self.ADDR = (self.SERVER, self.PORT)
+        self.socket = None
         self.connected = False
         # - - - - Set basic logging config - - - - - - - -
-        logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S')
+        logging.basicConfig(format='%(asctime)s - %(message)s',
+                            datefmt='%d-%b-%y %H:%M:%S', level=logging.DEBUG)
         self.logger = logging.getLogger(__name__)
         # - - - - Initialize list of COMMANDS - - - - -
-        self.COMMANDS = ['w','a','s','d','wd','wa','sd','sa','q','e','stop']
+        self.COMMANDS = ['w', 'a', 's', 'd', 'wd',
+                         'wa', 'sd', 'sa', 'q', 'e', 'stop']
         # - - - - Initialize motor controller - - - - -
         self.drivetime = 0.2
         self.moco = MotorController()
@@ -29,7 +38,7 @@ class Client(object):
         self.cap = cv2.VideoCapture(0)
         self.cap.set(3, 256)
         self.cap.set(4, 144)
-        _,self.frame=self.cap.read()
+        _, self.frame = self.cap.read()
         time.sleep(1)
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.socket.connect(self.ADDR)
@@ -48,8 +57,8 @@ class Client(object):
                 try:
                     # self.socket.settimeout(5)
                     # logging.debug("Reading frame..")
-                    cv2.waitKey(100) #delay
-                    _,self.frame = self.cap.read()
+                    cv2.waitKey(100)  # delay
+                    _, self.frame = self.cap.read()
                     frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
                     data = pickle.dumps(frame)
                     self.socket.sendall(struct.pack("L", len(data)) + data)
@@ -67,56 +76,65 @@ class Client(object):
             TODO: Set up the protocol for the response handling.
             """
             while True:
-                data = self.socket.recv(self.HEADER) # ! Wait for this?
+                data = self.socket.recv(self.HEADER)  # ! Wait for this?
                 msg = pickle.loads(data)
-                logging.info(f"Server sent data: {msg}")
-                logging.info(f"data: {data}")
-                logging.info(f"msg: {msg}")
-                logging.info(f"bmsg: {msg.decode(self.FORMAT)}")
                 try:
-                    if msg in self.COMMANDS:
-                        if msg == 'w':
-                            logging.debug(f"Sending command to MOCO. |{msg}| ")
-                            self.moco.forward(drivetime = self.drivetime, inputspeed = 'LOW')
-                            logging.debug(f"Sent command to MOCO. |{msg}| ")
-                        elif msg == 'a':
-                            logging.debug(f"Sending command to MOCO. |{msg}| ")
-                            self.moco.left(drivetime = self.drivetime, inputspeed = 'LOW')
-                            logging.debug(f"Sent command to MOCO. |{msg}| ")
-                        elif msg == 's':
-                            logging.debug(f"Sending command to MOCO. |{msg}| ")
-                            self.moco.backward(drivetime = self.drivetime, inputspeed = 'LOW')
-                            logging.debug(f"Sent command to MOCO. |{msg}| ")
-                        elif msg == 'd':
-                            logging.debug(f"Sending command to MOCO. |{msg}| ")
-                            self.moco.right(drivetime = self.drivetime, inputspeed = 'LOW')
-                            logging.debug(f"Sent command to MOCO. |{msg}| ")
-                        elif msg == 'wd':
-                            logging.debug(f"Sending command to MOCO. |{msg}| ")
-                            self.moco.wddiagonal(drivetime = self.drivetime, inputspeed = 'LOW')
-                        elif msg == 'wa':
-                            logging.debug(f"Sending command to MOCO. |{msg}| ")
-                            self.moco.wadiagonal(drivetime = self.drivetime, inputspeed = 'LOW')
-                        elif msg == 'sd':
-                            logging.debug(f"Sending command to MOCO. |{msg}| ")
-                            self.moco.sddiagonal(drivetime = self.drivetime, inputspeed = 'LOW')
-                        elif msg == 'sa':
-                            logging.debug(f"Sending command to MOCO. |{msg}| ")
-                            self.moco.sadiagonal(drivetime = self.drivetime, inputspeed = 'LOW')
-                        elif msg == 'q':
-                            logging.debug(f"Sending command to MOCO. |{msg}| ")
-                            self.moco.rotate(direction = 'COUNTER_CLOCKWISE',
-                                            drivetime = self.drivetime, inputspeed = 'LOW')
-                        elif msg == 'e':
-                            logging.debug(f"Sending command to MOCO. |{msg}| ")
-                            self.moco.rotate(direction = 'CLOCKWISE',
-                                            drivetime = self.drivetime, inputspeed = 'LOW')
-                        elif msg == 'stop':
-                            logging.debug(f"Sending command to MOCO. |{msg}| ")
-                            self.moco.stop()
-                            logging.debug(f"Sent command to MOCO. |{msg}| ")
+                    # !DEBUG
+                    logging.info(f"Server sent data: {msg}")
+                    logging.debug(f"data: {data}")
+                    logging.debug(f"msg: {msg}")
+                    # !DEBUG-END
+                    if msg == 'w':
+                        logging.debug(f"Sending command to MOCO. |{msg}| ")
+                        self.moco.forward(
+                            drivetime=self.drivetime, inputspeed='LOW')
+                        logging.debug(f"Sent command to MOCO. |{msg}| ")
+                    elif msg == 'a':
+                        logging.debug(f"Sending command to MOCO. |{msg}| ")
+                        self.moco.left(drivetime=self.drivetime,
+                                       inputspeed='LOW')
+                        logging.debug(f"Sent command to MOCO. |{msg}| ")
+                    elif msg == 's':
+                        logging.debug(f"Sending command to MOCO. |{msg}| ")
+                        self.moco.backward(
+                            drivetime=self.drivetime, inputspeed='LOW')
+                        logging.debug(f"Sent command to MOCO. |{msg}| ")
+                    elif msg == 'd':
+                        logging.debug(f"Sending command to MOCO. |{msg}| ")
+                        self.moco.right(
+                            drivetime=self.drivetime, inputspeed='LOW')
+                        logging.debug(f"Sent command to MOCO. |{msg}| ")
+                    elif msg == 'wd':
+                        logging.debug(f"Sending command to MOCO. |{msg}| ")
+                        self.moco.wddiagonal(
+                            drivetime=self.drivetime, inputspeed='LOW')
+                    elif msg == 'wa':
+                        logging.debug(f"Sending command to MOCO. |{msg}| ")
+                        self.moco.wadiagonal(
+                            drivetime=self.drivetime, inputspeed='LOW')
+                    elif msg == 'sd':
+                        logging.debug(f"Sending command to MOCO. |{msg}| ")
+                        self.moco.sddiagonal(
+                            drivetime=self.drivetime, inputspeed='LOW')
+                    elif msg == 'sa':
+                        logging.debug(f"Sending command to MOCO. |{msg}| ")
+                        self.moco.sadiagonal(
+                            drivetime=self.drivetime, inputspeed='LOW')
+                    elif msg == 'q':
+                        logging.debug(f"Sending command to MOCO. |{msg}| ")
+                        self.moco.rotate(direction='COUNTER_CLOCKWISE',
+                                         drivetime=self.drivetime, inputspeed='LOW')
+                    elif msg == 'e':
+                        logging.debug(f"Sending command to MOCO. |{msg}| ")
+                        self.moco.rotate(direction='CLOCKWISE',
+                                         drivetime=self.drivetime, inputspeed='LOW')
+                    elif msg == 'stop':
+                        logging.debug(f"Sending command to MOCO. |{msg}| ")
+                        self.moco.stop()
+                        logging.debug(f"Sent command to MOCO. |{msg}| ")
                 except Exception as e:
                     logging.debug(f"Exception occured: {e}")
+                    logging.debug(e.with_traceback())
 
 
 if __name__ == '__main__':
@@ -127,18 +145,18 @@ if __name__ == '__main__':
     logging.debug("Created Client")
     client.start()
     logging.debug("Started Client")
-    
-    pipeline    = queue.Queue(maxsize = 5)
-    event       = threading.Event()
-    with ThreadPoolExecutor(max_workers = 2) as executor:
+
+    pipeline = queue.Queue(maxsize=5)
+    event = threading.Event()
+    with ThreadPoolExecutor(max_workers=2) as executor:
         executor.submit(client.handle_read, pipeline, event)
         executor.submit(client.handle_send, pipeline, event)
-    
+
     # sendthread = Thread(target=client.handle_send, args=(), daemon=True)
     # readthread = Thread(target=client.handle_read, args=(), daemon=True)
     # # sendthread.start()
     # readthread.start()
-    
+
     # run = True
     # while run:
     #     if readthread.join() != None:
