@@ -47,13 +47,13 @@ class Client(object):
             while self.connected:
                 try:
                     # self.socket.settimeout(5)
-                    logging.debug("Reading frame..")
+                    # logging.debug("Reading frame..")
                     cv2.waitKey(100) #delay
                     _,self.frame = self.cap.read()
                     frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
                     data = pickle.dumps(frame)
                     self.socket.sendall(struct.pack("L", len(data)) + data)
-                    logging.debug(f"sent: {len(data)}")
+                    # logging.debug(f"sent: {len(data)}")
                 except Exception as e:
                     self.logger.exception(f"[ERROR] Closing.. {e}")
                     break
@@ -108,7 +108,7 @@ class Client(object):
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S',
-                        level=logging.INFO)
+                        level=logging.DEBUG)
     logging.debug("Started program")
     client = Client()
     logging.debug("Created Client")
