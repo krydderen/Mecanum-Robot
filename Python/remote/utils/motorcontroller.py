@@ -1,6 +1,7 @@
 from serial import Serial
 from time import sleep
 import RPi.GPIO as GPIO
+import logging
 
 class MotorController:
     
@@ -197,6 +198,7 @@ class MotorController:
     
 
     def forward(self, drivetime, inputspeed):
+        print("[MOCO] w ")
         self.fspeed = 0
         
         if inputspeed == 'HIGH':
