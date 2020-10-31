@@ -26,6 +26,11 @@ def rungame(queue, events):
         stopped = False
         run = True
         pygame.init()
+        pygame.joystick.init()
+        if pygame.joystick.get_count() > 0:
+                stick = pygame.joystick.Joystick(0)
+                stick.init()
+            
         while run:
             connected = server.isconnected()
             # connected = False
@@ -41,6 +46,12 @@ def rungame(queue, events):
                 if event.type == pygame.QUIT:
                     run = False
 
+            if stick.get_init:
+                buttons = stick.get_numbuttons()
+                stick_L = (stick.get_axis(0), stick.get_axis(1))
+                #for button in range(buttons):
+                print(stick_L)
+                
             keys = pygame.key.get_pressed()
 
             move = False
@@ -54,7 +65,7 @@ def rungame(queue, events):
             #         drive_speed = 'LOW'
             #         logging.debug('Drive speed is now LOW')
 
-            if (keys[pygame.K_w] and keys[pygame.K_d]) or (keys[pygame.K_UP] and keys[pygame.K_RIGHT]):
+            if (keys[pygame.K_w] and keys[pygame.K_d]) or (keys[pygame.K_UP] and keys[pygame.K_RIGHT]) or stick_L[0] > 0.3 and stick_L[1] < -0.3:
                 logging.debug('wd')
                 move = True
                 y -= vel
@@ -62,7 +73,7 @@ def rungame(queue, events):
                 if connected:
                     server.send('wd')
                 # mc.wddiagonal(drivetime = drive_time, inputspeed = drive_speed)
-            elif (keys[pygame.K_w] and keys[pygame.K_a]) or (keys[pygame.K_UP] and keys[pygame.K_LEFT]):
+            elif (keys[pygame.K_w] and keys[pygame.K_a]) or (keys[pygame.K_UP] and keys[pygame.K_LEFT]) or stick_L[0] < -0.3 and stick_L[1] < -0.3:
                 logging.debug('wa')
                 move = True
                 y -= vel
@@ -70,7 +81,7 @@ def rungame(queue, events):
                 if connected:
                     server.send('wa')
                 # mc.wadiagonal(drivetime = drive_time, inputspeed = drive_speed)
-            elif (keys[pygame.K_s] and keys[pygame.K_d]) or (keys[pygame.K_DOWN] and keys[pygame.K_RIGHT]):
+            elif (keys[pygame.K_s] and keys[pygame.K_d]) or (keys[pygame.K_DOWN] and keys[pygame.K_RIGHT]) or stick_L[0] > 0.3 and stick_L[1] > 0.3:
                 logging.debug('sd')
                 move = True
                 y += vel
@@ -78,7 +89,7 @@ def rungame(queue, events):
                 if connected:
                     server.send('sd')
                 # mc.sddiagonal(drivetime = drive_time, inputspeed = drive_speed)
-            elif (keys[pygame.K_s] and keys[pygame.K_a]) or (keys[pygame.K_DOWN] and keys[pygame.K_LEFT]):
+            elif (keys[pygame.K_s] and keys[pygame.K_a]) or (keys[pygame.K_DOWN] and keys[pygame.K_LEFT]) or stick_L[0] < -0.3 and stick_L[1] > 0.3:
                 logging.debug('sa')
                 move = True
                 y += vel
@@ -86,28 +97,28 @@ def rungame(queue, events):
                 if connected:
                     server.send('sa')
                 # mc.sadiagonal(drivetime = drive_time, inputspeed = drive_speed)
-            elif keys[pygame.K_w] or keys[pygame.K_UP]:
+            elif keys[pygame.K_w] or keys[pygame.K_UP] or stick_L[1] < -0.3:
                 logging.debug('up')
                 move = True
                 y -= vel
                 if connected:
                     server.send('w')
                 # mc.forward(drivetime = drive_time, inputspeed = drive_speed)
-            elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
+            elif keys[pygame.K_s] or keys[pygame.K_DOWN] or stick_L[1] > 0.3:
                 logging.debug('down')
                 move = True
                 y += vel
                 if connected:
                     server.send('s')
                 # mc.backward(drivetime = drive_time, inputspeed = drive_speed)
-            elif keys[pygame.K_a] or keys[pygame.K_LEFT]:
+            elif keys[pygame.K_a] or keys[pygame.K_LEFT] or stick_L[0] <- 0.3:
                 logging.debug('left')
                 move = True
                 x -= vel
                 if connected:
                     server.send('a')
                 # mc.left(drivetime = drive_time, inputspeed = drive_speed)
-            elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
+            elif keys[pygame.K_d] or keys[pygame.K_RIGHT] or stick_L[0] > 0.3:
                 logging.debug('right')
                 move = True
                 x += vel
