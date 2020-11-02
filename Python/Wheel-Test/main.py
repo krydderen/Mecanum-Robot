@@ -54,24 +54,32 @@ while run:
         move = True
         y -= vel
         x += vel
+        rc.ForwardM2(0x80, 64)
+        rc.ForwardM2(0x81, 64)
         # mc.wddiagonal(drivetime = drive_time, inputspeed = drive_speed)
     elif (keys[pygame.K_w] and keys[pygame.K_a]) or (keys[pygame.K_UP] and keys[pygame.K_LEFT]):
         logging.debug('wa')
         move = True
         y -= vel
         x -= vel
+        rc.ForwardM1(0x80, 64)
+        rc.ForwardM1(0x81, 64)
         # mc.wadiagonal(drivetime = drive_time, inputspeed = drive_speed)
     elif (keys[pygame.K_s] and keys[pygame.K_d]) or (keys[pygame.K_DOWN] and keys[pygame.K_RIGHT]):
         logging.debug('sd')
         move = True
         y += vel
         x += vel
+        rc.BackwardM1(0x80, 64)
+        rc.BackwardM1(0x81, 64)
         # mc.sddiagonal(drivetime = drive_time, inputspeed = drive_speed)
     elif (keys[pygame.K_s] and keys[pygame.K_a]) or (keys[pygame.K_DOWN] and keys[pygame.K_LEFT]):
         logging.debug('sa')
         move = True
         y += vel
         x -= vel
+        rc.BackwardM2(0x80, 64)
+        rc.BackwardM2(0x81, 64)
         # mc.sadiagonal(drivetime = drive_time, inputspeed = drive_speed)
     elif keys[pygame.K_w] or keys[pygame.K_UP]:
         logging.debug('up')
@@ -82,37 +90,49 @@ while run:
         rc.ForwardM1(0x81, 64)
         rc.ForwardM2(0x80, 64)
         rc.ForwardM2(0x81, 64)
-        #sleep(2)
-        #rc.ForwardM1(0x80, 0)
-        #rc.ForwardM1(0x81, 0)
-        #rc.ForwardM2(0x80, 0)
-        #rc.ForwardM2(0x81, 0)
-        # mc.forward(drivetime = drive_time, inputspeed = drive_speed)
     elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
         logging.debug('down')
         move = True
         y += vel
-        rc.BackwardMixed(0x80, 64)
-        rc.BackwardMixed(0x81, 64)
+        rc.BackwardM1(0x80, 64)
+        rc.BackwardM1(0x81, 64)
+        rc.BackwardM2(0x80, 64)
+        rc.BackwardM2(0x81, 64)
         # mc.backward(drivetime = drive_time, inputspeed = drive_speed)
     elif keys[pygame.K_a] or keys[pygame.K_LEFT]:
         logging.debug('left')
         move = True
         x -= vel
+        rc.BackwardM2(0x80,64)
+        rc.ForwardM1(0x80,64)
+        rc.ForwardM1(0x81,64)
+        rc.BackwardM2(0x81,64)
         # mc.left(drivetime = drive_time, inputspeed = drive_speed)
     elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
         logging.debug('right')
         move = True
         x += vel
+        rc.BackwardM1(0x80,64)
+        rc.ForwardM2(0x80,64)
+        rc.ForwardM2(0x81,64)
+        rc.BackwardM1(0x81,64)
         # mc.right(drivetime = drive_time, inputspeed = drive_speed)
     elif keys[pygame.K_q]:
         logging.debug('counterclockwise')
         move = True
+        rc.BackwardM2(0x80, 64)
+        rc.ForwardM1(0x80, 64)
+        rc.ForwardM2(0x81, 64)
+        rc.BackwardM1(0x81, 64)
         # mc.rotate(direction = 'COUNTER_CLOCKWISE',drivetime = drive_time,
                 #   inputspeed = drive_speed)
     elif keys[pygame.K_e]:
         logging.debug('clockwise')
         move = True
+        rc.BackwardM1(0x80, 64)
+        rc.ForwardM2(0x80, 64)
+        rc.ForwardM1(0x81, 64)
+        rc.BackwardM2(0x81, 64)
         # mc.rotate(direction = 'CLOCKWISE',drivetime = drive_time,
                 #   inputspeed = drive_speed)
 
