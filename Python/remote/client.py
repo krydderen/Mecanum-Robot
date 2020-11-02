@@ -9,6 +9,7 @@ import numpy as np
 import cv2
 # from utils.motorcontroller import *
 from concurrent.futures import ThreadPoolExecutor
+from utils.motorcontroller import MotorController
 
 
 class Client(object):
@@ -29,8 +30,8 @@ class Client(object):
         self.COMMANDS = ['w', 'a', 's', 'd', 'wd',
                          'wa', 'sd', 'sa', 'q', 'e', 'stop']
         # - - - - Initialize motor controller - - - - -
-        # self.drivetime = 0.2
-        # self.moco = MotorController()
+        self.drivetime = 0.2
+        self.moco = MotorController()
 
     def start(self):
         self.logger.info("Starting camera...")
