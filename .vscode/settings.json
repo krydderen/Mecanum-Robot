@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "C:\\Users\\Peter\\anaconda3\\python.exe",
+    "python.pythonPath": "C:\\Users\\Peter\\anaconda3\\envs\\py37\\python.exe",
     "python.linting.enabled": true,
     "python.testing.pytestArgs": [
         "Threading"
