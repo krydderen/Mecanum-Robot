@@ -21,14 +21,14 @@ height = 60
 vel = 5*2
 drive_time = 0.2
 drive_speed = 'LOW'
-stopped = False
+stopped = True
 run = True
 pygame.init()
 while run:
     # if server.isconnected():
     #     connected = True
 
-    pygame.time.delay(100)
+    pygame.time.delay(50)
 
     currentevents = pygame.event.get()
 
@@ -76,9 +76,17 @@ while run:
     elif keys[pygame.K_w] or keys[pygame.K_UP]:
         logging.debug('up')
         move = True
+        stopped = False
         y -= vel
-        rc.ForwardMixed(0x80, 64)
-        rc.ForwardMixed(0x81, 64)
+        rc.ForwardM1(0x80, 64)
+        rc.ForwardM1(0x81, 64)
+        rc.ForwardM2(0x80, 64)
+        rc.ForwardM2(0x81, 64)
+        #sleep(2)
+        #rc.ForwardM1(0x80, 0)
+        #rc.ForwardM1(0x81, 0)
+        #rc.ForwardM2(0x80, 0)
+        #rc.ForwardM2(0x81, 0)
         # mc.forward(drivetime = drive_time, inputspeed = drive_speed)
     elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
         logging.debug('down')
@@ -110,15 +118,15 @@ while run:
 
     if move == False and stopped == False: 
         #mc.stop()
-        for address in addresses:
-            rc.ForwardMixed(address, 0)
-            rc.BackwardMixed(address,0)
-            rc.TurnRightMixed(address,0)
-            rc.TurnLeftMixed(address,0)
-            rc.ForwardM1(address,0)
-            rc.TorwardM2(address,0)
-            rc.BackwardM1(address,0)
-            rc.BackwardM2(address,0)
+        logging.debug('stop')
+        rc.ForwardM1(0x80,0)
+        rc.ForwardM2(0x80,0)
+        rc.BackwardM1(0x80,0)
+        rc.BackwardM2(0x80,0)
+        rc.ForwardM1(0x81,0)
+        rc.ForwardM2(0x81,0)
+        rc.BackwardM1(0x81,0)
+        rc.BackwardM2(0x81,0)
         stopped = True
         
     else:
