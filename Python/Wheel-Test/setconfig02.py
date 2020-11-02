@@ -16,7 +16,6 @@ if __name__ == "__main__":
     baud = 0x0060
     addr = 0x0100
     mum  = 0x8000
-    
     test = 0x8163
     print('setting config ', pack | baud | addr | mum)
     #roboclaw.SetConfig(address, (pack | baud | addr | mum))

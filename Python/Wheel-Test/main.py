@@ -18,7 +18,7 @@ drive_speed = 'LOW'
 run = True
 motor_controller = MotorController()
 while run:
-    pygame.time.delay(10)
+    pygame.time.delay(100)
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
