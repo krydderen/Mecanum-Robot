@@ -52,6 +52,7 @@ while run:
     if (keys[pygame.K_w] and keys[pygame.K_d]) or (keys[pygame.K_UP] and keys[pygame.K_RIGHT]):
         logging.debug('wd')
         move = True
+        stopped = False
         y -= vel
         x += vel
         rc.ForwardM2(0x80, 64)
@@ -60,6 +61,7 @@ while run:
     elif (keys[pygame.K_w] and keys[pygame.K_a]) or (keys[pygame.K_UP] and keys[pygame.K_LEFT]):
         logging.debug('wa')
         move = True
+        stopped = False
         y -= vel
         x -= vel
         rc.ForwardM1(0x80, 64)
@@ -68,6 +70,7 @@ while run:
     elif (keys[pygame.K_s] and keys[pygame.K_d]) or (keys[pygame.K_DOWN] and keys[pygame.K_RIGHT]):
         logging.debug('sd')
         move = True
+        stopped = False
         y += vel
         x += vel
         rc.BackwardM1(0x80, 64)
@@ -76,6 +79,7 @@ while run:
     elif (keys[pygame.K_s] and keys[pygame.K_a]) or (keys[pygame.K_DOWN] and keys[pygame.K_LEFT]):
         logging.debug('sa')
         move = True
+        stopped = False
         y += vel
         x -= vel
         rc.BackwardM2(0x80, 64)
@@ -93,6 +97,7 @@ while run:
     elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
         logging.debug('down')
         move = True
+        stopped = False
         y += vel
         rc.BackwardM1(0x80, 64)
         rc.BackwardM1(0x81, 64)
@@ -102,6 +107,7 @@ while run:
     elif keys[pygame.K_a] or keys[pygame.K_LEFT]:
         logging.debug('left')
         move = True
+        stopped = False
         x -= vel
         rc.BackwardM2(0x80,64)
         rc.ForwardM1(0x80,64)
@@ -111,6 +117,7 @@ while run:
     elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
         logging.debug('right')
         move = True
+        stopped = False
         x += vel
         rc.BackwardM1(0x80,64)
         rc.ForwardM2(0x80,64)
@@ -120,6 +127,7 @@ while run:
     elif keys[pygame.K_q]:
         logging.debug('counterclockwise')
         move = True
+        stopped = False
         rc.BackwardM2(0x80, 64)
         rc.ForwardM1(0x80, 64)
         rc.ForwardM2(0x81, 64)
@@ -129,6 +137,7 @@ while run:
     elif keys[pygame.K_e]:
         logging.debug('clockwise')
         move = True
+        stopped = False
         rc.BackwardM1(0x80, 64)
         rc.ForwardM2(0x80, 64)
         rc.ForwardM1(0x81, 64)
