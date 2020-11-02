@@ -83,3 +83,14 @@ class MotorController(object):
             for address in self.addresses:
                 self.roboclaw.TurnRightMixed(address, 32)
                 sleep(drivetime)
+    
+    def stop(self):
+        for address in self.addresses:
+            self.roboclaw.ForwardMixed(address, 0)
+            self.roboclaw.BackwardMixed(address,0)
+            self.roboclaw.TurnRightMixed(address,0)
+            self.roboclaw.TurnLeftMixed(address,0)
+            self.roboclaw.ForwardM1(address,0)
+            self.roboclaw.ForwardM2(address,0)
+            self.roboclaw.BackwardM1(address,0)
+            self.roboclaw.BackwardM2(address,0)
