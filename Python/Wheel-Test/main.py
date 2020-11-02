@@ -1,12 +1,10 @@
-from motorcontroller import *
-import logging
+from motorcontroller import MotorController
 import pygame
-import logging
 pygame.init()
 
 
 win = pygame.display.set_mode((500,500))
-pygame.display.set_caption("Mecanum controller")
+pygame.display.set_caption("First Game")
 
 x = 50
 y = 50
@@ -30,72 +28,53 @@ while run:
     
     move = False
 
-    
-    # Change motorspeed of the robot.
-    speed_premap = 0
-    if keys[pygame.K_t]:
-        try:
-            speed_premap = (input("set speed from 0 to 100: "))
-            if not type(speed_premap) is int:
-                raise TypeError("Please only use integers for speed setting ")
-            elif (speed_premap < 0) or (speed_premap > 100):
-                raise ValueError("Speedrange is from 0 to 100: ")
-        except Exception as e:
-                print("Error occured ", e)
-        motor_controller.speed_change(speed_premap)
-        
-        """ if drive_speed == 'LOW':
-            drive_speed = 'HIGH'
-            print('Drive speed is now HIGH')
-        elif drive_speed == 'HIGH':
-            drive_speed = 'LOW'
-            print('Drive speed is now LOW')       
-        """
-        
     if (keys[pygame.K_w] and keys[pygame.K_d])   or (keys[pygame.K_UP] and keys[pygame.K_RIGHT]):
-        logging.debug('wd')
+        print('wd')
         move = True; y -= vel; x += vel
-        motor_controller.diagonals(direction = 'wd', drivetime = drive_time)
+        motor_controller.wddiagonal(drivetime = drive_time, inputspeed = drive_speed)
     elif (keys[pygame.K_w] and keys[pygame.K_a]) or (keys[pygame.K_UP] and keys[pygame.K_LEFT]):
-        logging.debug('wa')
+        print('wa')
         move = True; y -= vel; x -= vel
-        motor_controller.diagonals(direction = 'wa', drivetime = drive_time)
+        motor_controller.wadiagonal(drivetime = drive_time, inputspeed = drive_speed)
     elif (keys[pygame.K_s] and keys[pygame.K_d]) or (keys[pygame.K_DOWN] and keys[pygame.K_RIGHT]):
-        logging.debug('sd')
-        move = True; y += vel; x += vel
-        motor_controller.diagonals(direction = 'sd', drivetime = drive_time)
+        print('sd')
+        move = True; y += vel; x = vel
+        motor_controller.sddiagonal(drivetime = drive_time, inputspeed = drive_speed)
     elif (keys[pygame.K_s] and keys[pygame.K_a]) or (keys[pygame.K_DOWN] and keys[pygame.K_LEFT]):
-        logging.debug('sa')
+        print('sa')
         move = True; y += vel; x -= vel
-        motor_controller.diagonals(direction = 'sa', drivetime = drive_time)
-    elif keys[pygame.K_w] or keys[pygame.K_UP]:
-        logging.debug('up')
-        move = True
-        y -= vel
-        motor_controller.forward(drivetime = drive_time)
-    elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
-        logging.debug('down')
-        move = True
-        y += vel
-        motor_controller.backward(drivetime = drive_time)
-    elif keys[pygame.K_a] or keys[pygame.K_LEFT]:
-        logging.debug('left')
-        move = True
-        x -= vel
-        motor_controller.left(drivetime = drive_time)
-    elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-        logging.debug('right')
-        move = True
-        x += vel
-        motor_controller.right(drivetime = drive_time)
-    elif keys[pygame.K_q]:
-        logging.debug('counterclockwise')
-        move = True
-        motor_controller.rotate(direction = 'q',drivetime = drive_time)
-    elif keys[pygame.K_e]:
-        logging.debug('clockwise')
-        move = True
-        motor_controller.rotate(direction = 'e',drivetime = drive_time)   
+        motor_controller.sadiagonal(drivetime = drive_time, inputspeed = drive_speed)
+    
+        
+    if event.type == pygame.KEYDOWN and move != True:
+        if event.key == pygame.K_UP or event.key == ord('w'):
+            print('up')
+            move = True
+            y -= vel
+            motor_controller.forward(drivetime = drive_time, inputspeed = drive_speed)
+        elif event.key == pygame.K_DOWN or event.key == ord('s'):
+            print('down')
+            move = True
+            y += vel
+            motor_controller.backward(drivetime = drive_time, inputspeed = drive_speed)
+        elif event.key == pygame.K_LEFT or event.key == ord('a'):
+            print('left')
+            move = True
+            x -= vel
+            motor_controller.left(drivetime = drive_time, inputspeed = drive_speed)
+        elif event.key == pygame.K_RIGHT or event.key == ord('d'):
+            print('right')
+            move = True
+            x += vel
+            motor_controller.right(drivetime = drive_time, inputspeed = drive_speed)
+        elif event.key == ord('q'):
+            print('counterclockwise')
+            move = True
+            motor_controller.rotate(direction = 'COUNTER_CLOCKWISE',drivetime = drive_time, inputspeed = drive_speed)
+        elif event.key == ord('e'):
+            print('clockwise')
+            move = True
+            motor_controller.rotate(direction = 'CLOCKWISE',drivetime = drive_time, inputspeed = drive_speed)
     
     if move == False:
         motor_controller.stop()
