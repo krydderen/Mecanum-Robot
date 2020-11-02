@@ -12,11 +12,12 @@ class MotorController(object):
         baudrate    = 38400
         self.roboclaw = Roboclaw(serial_port, baudrate)
         self.roboclaw.Open()
+        self.speed = 64
         
     def forward(self, drivetime):
         
         for address in self.addresses:
-            self.roboclaw.ForwardMixed(address, 32)
+            self.roboclaw.ForwardMixed(address, self.speed)
         
         sleep(drivetime)
         
@@ -26,7 +27,7 @@ class MotorController(object):
     def backward(self, drivetime):
         
         for address in self.addresses:
-            self.roboclaw.BackwardMixed(address, 32)
+            self.roboclaw.BackwardMixed(address, self.speed)
         
         sleep(drivetime)
         
@@ -35,8 +36,8 @@ class MotorController(object):
     
     def right(self,drivetime):
         
-        self.roboclaw.TurnRightMixed(self.addresses[0], 32)
-        self.roboclaw.TurnLeftMixed(self.addresses[1], 32)
+        self.roboclaw.TurnRightMixed(self.addresses[0], self.speed)
+        self.roboclaw.TurnLeftMixed(self.addresses[1], self.speed)
         
         sleep(drivetime)
         
@@ -45,8 +46,8 @@ class MotorController(object):
 
     def left(self,drivetime):
         
-        self.roboclaw.TurnLeftMixed(self.addresses[0], 32)
-        self.roboclaw.TurnRightMixed(self.addresses[1], 32)
+        self.roboclaw.TurnLeftMixed(self.addresses[0], self.speed)
+        self.roboclaw.TurnRightMixed(self.addresses[1], self.speed)
         
         sleep(drivetime)
         
@@ -57,31 +58,31 @@ class MotorController(object):
         
         if direction == 'northeast' or direction == "wd":
             for address in self.addresses:  
-                self.roboclaw.ForwardM1(address, 32)
+                self.roboclaw.ForwardM1(address, self.speed)
                 sleep(drivetime)
         elif direction == 'northwest' or direction == "wa":
             for address in self.addresses:  
-                self.roboclaw.ForwardM2(address, 32)
+                self.roboclaw.ForwardM2(address, self.speed)
                 sleep(drivetime)
         elif direction == 'southeast' or direction == "sd":
             for address in self.addresses:  
-                self.roboclaw.BackwardM2(address, 32)
+                self.roboclaw.BackwardM2(address, self.speed)
                 sleep(drivetime)
         elif direction == 'southwest' or direction == "sa":
             for address in self.addresses:  
-                self.roboclaw.BackwardM1(address, 32)
+                self.roboclaw.BackwardM1(address, self.speed)
                 sleep(drivetime)
     
     def rotate(self, direction, drivetime):
         
         if direction == 'clockwise' or direction == 'e':
             for address in self.addresses:
-                self.roboclaw.TurnLeftMixed(address, 32)
+                self.roboclaw.TurnLeftMixed(address, self.speed)
                 sleep(drivetime)
 
         elif direction == 'counter-clockwise' or direction == 'q':
             for address in self.addresses:
-                self.roboclaw.TurnRightMixed(address, 32)
+                self.roboclaw.TurnRightMixed(address, self.speed)
                 sleep(drivetime)
     
     def stop(self):

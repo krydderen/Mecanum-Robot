@@ -3,7 +3,7 @@ from time import sleep
 
 if __name__ == "__main__":
     
-    address = 0x82
+    address = 0x80
     roboclaw = Roboclaw("/dev/ttyS0", 38400)
     roboclaw.Open()
     
@@ -18,9 +18,12 @@ if __name__ == "__main__":
     mum  = 0x8000
     
     test = 0x8163
-    print('setting config ', pack | baud | addr | mum)
+    #print('setting config ', test)
     #roboclaw.SetConfig(address, (pack | baud | addr | mum))
-    roboclaw.SetConfig(address,test)
+    #roboclaw.SetConfig(address,test)
+    
+    print('reset')
+    roboclaw.RestoreDefaults(0x80)
     
     print('new settings')
     print(roboclaw.GetConfig(address))
