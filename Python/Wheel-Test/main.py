@@ -1,12 +1,12 @@
 from motorcontroller import *
 import logging
 import pygame
+import logging
 pygame.init()
 
 
 win = pygame.display.set_mode((500,500))
-pygame.display.set_caption("First Game")
-logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.DEBUG)
+pygame.display.set_caption("Mecanum controller")
 
 x = 50
 y = 50
@@ -29,17 +29,28 @@ while run:
     keys = pygame.key.get_pressed()
     
     move = False
+
     
-    
-    # Change motor speed to high or low.
+    # Change motorspeed of the robot.
+    speed_premap = 0
     if keys[pygame.K_t]:
-        if drive_speed == 'LOW':
+        try:
+            speed_premap = (input("set speed from 0 to 100: "))
+            if not type(speed_premap) is int:
+                raise TypeError("Please only use integers for speed setting ")
+            elif (speed_premap < 0) or (speed_premap > 100):
+                raise ValueError("Speedrange is from 0 to 100: ")
+        except Exception as e:
+                print("Error occured ", e)
+        motor_controller.speed_change(speed_premap)
+        
+        """ if drive_speed == 'LOW':
             drive_speed = 'HIGH'
             print('Drive speed is now HIGH')
         elif drive_speed == 'HIGH':
             drive_speed = 'LOW'
             print('Drive speed is now LOW')       
-        
+        """
         
     if (keys[pygame.K_w] and keys[pygame.K_d])   or (keys[pygame.K_UP] and keys[pygame.K_RIGHT]):
         logging.debug('wd')
@@ -84,7 +95,7 @@ while run:
     elif keys[pygame.K_e]:
         logging.debug('clockwise')
         move = True
-        motor_controller.rotate(direction = 'CLOCKWISE',drivetime = drive_time, inputspeed = drive_speed)
+        motor_controller.rotate(direction = 'CLOCKWISE',drivetime = drive_time, inputspeed = drive_speed)   
     
     if move == False:
         motor_controller.stop()
