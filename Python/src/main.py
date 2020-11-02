@@ -29,11 +29,11 @@ def rungame(queue, events):
         while run:
             connected = server.isconnected()
             # connected = False
-            logging.debug(f"Server connection: {server.isconnected()}")
+            # logging.debug(f"Server connection: {server.isconnected()}")
             # if server.isconnected():
             #     connected = True
 
-            pygame.time.delay(100)
+            pygame.time.delay(50)
 
             currentevents = pygame.event.get()
 
@@ -57,6 +57,7 @@ def rungame(queue, events):
             if (keys[pygame.K_w] and keys[pygame.K_d]) or (keys[pygame.K_UP] and keys[pygame.K_RIGHT]):
                 logging.debug('wd')
                 move = True
+                stopped = False
                 y -= vel
                 x += vel
                 if connected:
@@ -65,6 +66,7 @@ def rungame(queue, events):
             elif (keys[pygame.K_w] and keys[pygame.K_a]) or (keys[pygame.K_UP] and keys[pygame.K_LEFT]):
                 logging.debug('wa')
                 move = True
+                stopped = False
                 y -= vel
                 x -= vel
                 if connected:
@@ -73,7 +75,7 @@ def rungame(queue, events):
             elif (keys[pygame.K_s] and keys[pygame.K_d]) or (keys[pygame.K_DOWN] and keys[pygame.K_RIGHT]):
                 logging.debug('sd')
                 move = True
-                y += vel
+                stopped = False
                 x += vel
                 if connected:
                     server.send('sd')
@@ -81,6 +83,7 @@ def rungame(queue, events):
             elif (keys[pygame.K_s] and keys[pygame.K_a]) or (keys[pygame.K_DOWN] and keys[pygame.K_LEFT]):
                 logging.debug('sa')
                 move = True
+                stopped = False
                 y += vel
                 x -= vel
                 if connected:
@@ -89,6 +92,7 @@ def rungame(queue, events):
             elif keys[pygame.K_w] or keys[pygame.K_UP]:
                 logging.debug('up')
                 move = True
+                stopped = False
                 y -= vel
                 if connected:
                     server.send('w')
@@ -96,6 +100,7 @@ def rungame(queue, events):
             elif keys[pygame.K_s] or keys[pygame.K_DOWN]:
                 logging.debug('down')
                 move = True
+                stopped = False
                 y += vel
                 if connected:
                     server.send('s')
@@ -103,6 +108,7 @@ def rungame(queue, events):
             elif keys[pygame.K_a] or keys[pygame.K_LEFT]:
                 logging.debug('left')
                 move = True
+                stopped = False
                 x -= vel
                 if connected:
                     server.send('a')
@@ -110,6 +116,7 @@ def rungame(queue, events):
             elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
                 logging.debug('right')
                 move = True
+                stopped = False
                 x += vel
                 if connected:
                     server.send('d')
@@ -117,6 +124,7 @@ def rungame(queue, events):
             elif keys[pygame.K_q]:
                 logging.debug('counterclockwise')
                 move = True
+                stopped = False
                 if connected:
                     server.send('q')
                 # mc.rotate(direction = 'COUNTER_CLOCKWISE',drivetime = drive_time,
@@ -124,6 +132,7 @@ def rungame(queue, events):
             elif keys[pygame.K_e]:
                 logging.debug('clockwise')
                 move = True
+                stopped = False
                 if connected:
                     server.send('e')
                 # mc.rotate(direction = 'CLOCKWISE',drivetime = drive_time,
@@ -131,10 +140,11 @@ def rungame(queue, events):
 
             if move == False and stopped == False: 
                 # mc.stop()
+                logging.debug('stop')
                 if connected:
+                    logging.debug('stop')
                     server.send('stop') 
                 stopped = True
-                pass
             else:
                 pass
 
