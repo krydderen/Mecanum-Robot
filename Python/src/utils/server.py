@@ -1,4 +1,21 @@
+#!/usr/bin/env python3
+#-*- coding: utf-8 -*-
+
+"""[summary]
+SERVER DOCSTRING
+- - S C R I P T  D O C S T R I N G  W I P - -
+Reference:
+    https://realpython.com/documenting-python-code/
+"""
+
+from queue import Queue
+from threading import Event
+import threading
 import cv2, pickle, socket, struct, sys, logging
+from typing import NoReturn
+
+class DisconnectMsg(Exception):
+    """"Warning. Disconnecting clients and shutting down."""
 
 class Server(object):
     def __init__(self):
@@ -18,7 +35,7 @@ class Server(object):
         self.addr = ''
         self.frame= ''
         
-    def handle_client(self, conn, addr):
+    def handle_client(self, conn: str, addr: str) -> NoReturn:
         self.logger.info(f"[NEW CONNECTION] {addr} connected.")
         data = b''
         while True:
@@ -57,7 +74,7 @@ class Server(object):
     def get_frame(self):
         return self.frame
     
-    def start(self, queue, event):
+    def start(self, queue: Queue, event: Event) -> NoReturn:
         while not event.is_set():
             self.server.listen(10)
             self.logger.info(f"Server is listening on {self.ADDR}")
@@ -80,23 +97,25 @@ class Server(object):
             #     break
     
 
-    def close(self):
+    def close(self) -> NoReturn:
         self.thread.join()
         self.connected = False
         self.server.close()
     
-    def isconnected(self):
+    def isconnected(self) -> bool:
         return self.connected
     
-    def send(self, message):
+    def send(self, message: str) -> NoReturn:
         try:
             # self.socket.settimeout(5)
             senddata = pickle.dumps(message)
             self.conn.send(senddata)
             logging.info(f"Sent {message} to client.")
             if message == "!DISCONNECT":
-                logging.debug("Closing server and sent disconnect message to client.")
-                self.close()
+                raise DisconnectMsg("Sending disconnect message to client.")
+        except DisconnectMsg as e: # TODO: Test this method.
+            logging.exception(f"{e}")
+            self.close()
         except Exception as e:
             logging.exception(f"[ERROR] Failed to send message to client. \n {e}")
             # self.close()

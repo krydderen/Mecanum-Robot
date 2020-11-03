@@ -1,35 +1,43 @@
+#!/usr/bin/env python3
+#-*- coding: utf-8 -*-
+
+"""[summary]
+CLIENT DOCCCC
+- - S C R I P T  D O C S T R I N G  W I P - -
+Reference:
+    https://realpython.com/documenting-python-code/
+"""
 import pickle
+from queue import Queue
 import socket
 import struct
+from threading import Event
 import time
 import logging
 import threading
 import queue
 import cv2
-# from utils.motorcontroller import *
 from roboclaw_3 import Roboclaw
 from concurrent.futures import ThreadPoolExecutor
-# from utils.motorcontroller import MotorController
 from time import sleep
+from typing import NoReturn
 
 
 class Client(object):
     def __init__(self):
-        self.HEADER = 4086
-        self.PORT = 8080
-        self.FORMAT = 'utf-8'
-        self.SERVER = '192.168.43.18'
+        # TODO: DO THIS EVERYWHERE, GOOD CODING?
+        self.HEADER : int = 4086
+        self.PORT   : int = 8080
+        self.FORMAT : str = 'utf-8'
+        self.SERVER : str = '192.168.43.18'
         # self.SERVER  = socket.gethostbyname(socket.gethostname())
-        self.ADDR = (self.SERVER, self.PORT)
+        self.ADDR   = (self.SERVER, self.PORT)
         self.socket = None
         self.connected = False
         # - - - - Set basic logging config - - - - - - - -
         logging.basicConfig(format='%(asctime)s - %(message)s',
                             datefmt='%d-%b-%y %H:%M:%S', level=logging.DEBUG)
         self.logger = logging.getLogger(__name__)
-        # - - - - Initialize list of COMMANDS - - - - -
-        self.COMMANDS = ['w', 'a', 's', 'd', 'wd',
-                         'wa', 'sd', 'sa', 'q', 'e', 'stop']
         # - - - - Initialize motor controller - - - - -
         self.drivetime = 0.2
         # self.moco = MotorController()
@@ -37,7 +45,7 @@ class Client(object):
         sleep(0.1)
         self.rc.Open()
 
-    def start(self):
+    def start(self) -> NoReturn:
         self.logger.info("Starting camera...")
         self.logger.debug(f"SERVER - {self.ADDR}")
         self.cap = cv2.VideoCapture(0)
@@ -50,13 +58,13 @@ class Client(object):
         self.connected = True
         self.logger.info(f"Successfully connected to {self.ADDR}")
 
-    def disconnect(self):
+    def disconnect(self) -> NoReturn:
         self.connected = False
         self.socket.close()
         self.cap.stop()
         self.logger.info(f"Successfully disconnected from {self.ADDR}")
 
-    def handle_send(self, queue, event):
+    def handle_send(self, queue: Queue, event: Event) -> NoReturn:
         while not event.is_set():
             while self.connected:
                 try:
@@ -72,7 +80,7 @@ class Client(object):
                     self.logger.exception(f"[ERROR] Closing.. {e}")
                     break
 
-    def handle_read(self, queue, event):
+    def handle_read(self, queue: Queue, event: Event) -> NoReturn:
         while not event.is_set():
             """ 
             TODO: Handle how the client reads the response from server.
@@ -177,6 +185,11 @@ class Client(object):
                         self.rc.BackwardM1(0x81,0)
                         self.rc.BackwardM2(0x81,0)
                         logging.debug(f"Sent command to MOCO. |{msg}| ")
+                        
+                    # TODO: Test this method.
+                    # elif msg == '!DISCONNECT':
+                    #     logging.debug(f"Disconnecting..")
+                    #     self.disconnect()                        
                 except Exception as e:
                     logging.debug(f"Exception occured: {e}")
                     logging.debug(e.with_traceback())
@@ -196,13 +209,3 @@ if __name__ == '__main__':
     with ThreadPoolExecutor(max_workers=2) as executor:
         executor.submit(client.handle_read, pipeline, event)
         executor.submit(client.handle_send, pipeline, event)
-
-    # sendthread = Thread(target=client.handle_send, args=(), daemon=True)
-    # readthread = Thread(target=client.handle_read, args=(), daemon=True)
-    # # sendthread.start()
-    # readthread.start()
-
-    # run = True
-    # while run:
-    #     if readthread.join() != None:
-    #         print(readthread.join())
