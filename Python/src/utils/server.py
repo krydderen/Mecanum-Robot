@@ -1,5 +1,4 @@
 import cv2, pickle, socket, struct, sys, logging
-from threading import Thread
 
 class Server(object):
     def __init__(self):
@@ -17,6 +16,7 @@ class Server(object):
         self.payload_size = struct.calcsize("L")
         self.conn = ''
         self.addr = ''
+        self.frame= ''
         
     def handle_client(self, conn, addr):
         self.logger.info(f"[NEW CONNECTION] {addr} connected.")
@@ -37,23 +37,26 @@ class Server(object):
                 frame_data = data[:msg_size]
                 data = data[msg_size:]
 
-                frame=pickle.loads(frame_data)
-                logging.debug(frame.size)
-                cv2.namedWindow('frame',cv2.WINDOW_NORMAL)
-                cv2.resizeWindow('frame', 640,480)
+                self.frame=pickle.loads(frame_data)
+                # logging.debug(frame.size)
+                # cv2.namedWindow('frame',cv2.WINDOW_NORMAL)
+                # cv2.resizeWindow('frame', 640,480)
                 # cv2.resizeWindow('frame', 1920,1080)
-                cv2.imshow('frame', frame)
-                if cv2.waitKey(10) & 0xFF == ord('q'):
-                    cv2.destroyAllWindows()
-                    conn.close()
-                    break
+                # cv2.imshow('frame', frame)
+                # if cv2.waitKey(10) & 0xFF == ord('q'):
+                #     cv2.destroyAllWindows()
+                #     conn.close()
+                #     break
                 
             except Exception as e:
                 self.logger.info(f"[ERROR] Closing.. {e}")
                 self.logger.debug(f"[DEBUG] {e.with_traceback()}")
                 break    
         conn.close()     
-        
+    
+    def get_frame(self):
+        return self.frame
+    
     def start(self, queue, event):
         while not event.is_set():
             self.server.listen(10)
@@ -91,6 +94,9 @@ class Server(object):
             senddata = pickle.dumps(message)
             self.conn.send(senddata)
             logging.info(f"Sent {message} to client.")
+            if message == "!DISCONNECT":
+                logging.debug("Closing server and sent disconnect message to client.")
+                self.close()
         except Exception as e:
             logging.exception(f"[ERROR] Failed to send message to client. \n {e}")
             # self.close()

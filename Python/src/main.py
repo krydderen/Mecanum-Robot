@@ -1,6 +1,8 @@
+#!/usr/bin/env python3
+#-*- coding: utf-8 -*-
+
 # Importing packages
 import logging
-import cv2
 import pygame
 import queue
 import threading
@@ -153,6 +155,7 @@ def rungame(queue, events):
             pygame.display.update()
 
         logging.debug("Closing server...")
+        server.send("!DISCONNECT")
         server.close()
         logging.debug("Closing game...")
         pygame.quit()
@@ -161,7 +164,7 @@ def rungame(queue, events):
 
 if __name__ == '__main__':
     logging.basicConfig(format='%(asctime)s - %(message)s',
-                        level=logging.INFO)
+                        level=logging.DEBUG)
 
     server = Server()
 
@@ -170,11 +173,3 @@ if __name__ == '__main__':
     with ThreadPoolExecutor(max_workers=2) as executor:
         executor.submit(rungame, pipeline, event)
         executor.submit(server.start, pipeline, event)
-
-    # server  = server()
-    # server.start()
-    # serverthread = Theread(target=server.start(), args=(), daemon = True)
-    # gamethread = Thread(target=rungame(), args=(), daemon=True)
-
-    # gamethread.start()
-    # serverthread.start()

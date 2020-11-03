@@ -18,7 +18,7 @@ manager.set_visual_debug_mode((True))
 hello_button = pygame_gui.elements.UIButton(relative_rect=pygame.Rect((350,275), (100,50)),
                                             text= 'Say Hello',
                                             manager=manager)
-hello_button.
+
 # * 2 - Create the clock timer
 clock = pygame.time.Clock()
 
