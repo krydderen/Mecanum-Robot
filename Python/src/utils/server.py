@@ -42,6 +42,8 @@ class Server(object):
                 cv2.namedWindow('frame',cv2.WINDOW_NORMAL)
                 cv2.resizeWindow('frame', 640,480)
                 # cv2.resizeWindow('frame', 1920,1080)
+                frame = cv2.flip(frame,0)
+                frame = cv2.flip(frame,1)
                 cv2.imshow('frame', frame)
                 if cv2.waitKey(10) & 0xFF == ord('q'):
                     cv2.destroyAllWindows()
