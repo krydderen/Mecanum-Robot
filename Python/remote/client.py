@@ -44,6 +44,7 @@ class Client(object):
         self.rc = Roboclaw("/dev/ttyS0", 38400)
         sleep(0.1)
         self.rc.Open()
+        self.SPEED = 80
 
     def start(self) -> NoReturn:
         self.logger.info("Starting camera...")
@@ -101,78 +102,78 @@ class Client(object):
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         # self.moco.forward(
                         #     drivetime=0.2, inputspeed='LOW')
-                        self.rc.ForwardM1(0x80, 64)
-                        self.rc.ForwardM1(0x81, 64)
-                        self.rc.ForwardM2(0x80, 64)
-                        self.rc.ForwardM2(0x81, 64)
+                        self.rc.ForwardM1(0x80, self.SPEED)
+                        self.rc.ForwardM1(0x81, self.SPEED)
+                        self.rc.ForwardM2(0x80, self.SPEED)
+                        self.rc.ForwardM2(0x81, self.SPEED)
                         logging.debug(f"Sent command to MOCO. |{msg}| ")
                     elif msg == 'a':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         # self.moco.left(drivetime=0.2,
                         #                inputspeed='LOW')
-                        self.rc.BackwardM2(0x80,64)
-                        self.rc.ForwardM1(0x80,64)
-                        self.rc.ForwardM1(0x81,64)
-                        self.rc.BackwardM2(0x81,64)
+                        self.rc.BackwardM2(0x80,self.SPEED)
+                        self.rc.ForwardM1(0x80,self.SPEED)
+                        self.rc.ForwardM1(0x81,self.SPEED)
+                        self.rc.BackwardM2(0x81,self.SPEED)
                         logging.debug(f"Sent command to MOCO. |{msg}| ")
                     elif msg == 's':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         # self.moco.backward(
                         #     drivetime=0.2, inputspeed='LOW')
-                        self.rc.BackwardM1(0x80, 64)
-                        self.rc.BackwardM1(0x81, 64)
-                        self.rc.BackwardM2(0x80, 64)
-                        self.rc.BackwardM2(0x81, 64)
+                        self.rc.BackwardM1(0x80, self.SPEED)
+                        self.rc.BackwardM1(0x81, self.SPEED)
+                        self.rc.BackwardM2(0x80, self.SPEED)
+                        self.rc.BackwardM2(0x81, self.SPEED)
                         logging.debug(f"Sent command to MOCO. |{msg}| ")
                     elif msg == 'd':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         # self.moco.right(
                         #     drivetime=0.2, inputspeed='LOW')
-                        self.rc.BackwardM1(0x80,64)
-                        self.rc.ForwardM2(0x80,64)
-                        self.rc.ForwardM2(0x81,64)
-                        self.rc.BackwardM1(0x81,64)
+                        self.rc.BackwardM1(0x80,self.SPEED)
+                        self.rc.ForwardM2(0x80,self.SPEED)
+                        self.rc.ForwardM2(0x81,self.SPEED)
+                        self.rc.BackwardM1(0x81,self.SPEED)
                         logging.debug(f"Sent command to MOCO. |{msg}| ")
                     elif msg == 'wd':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         # self.moco.wddiagonal(
                         #     drivetime=0.2, inputspeed='LOW')
-                        self.rc.ForwardM2(0x80, 64)
-                        self.rc.ForwardM2(0x81, 64)
+                        self.rc.ForwardM2(0x80, self.SPEED)
+                        self.rc.ForwardM2(0x81, self.SPEED)
                     elif msg == 'wa':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         # self.moco.wadiagonal(
                         #     drivetime=0.2, inputspeed='LOW')
-                        self.rc.ForwardM1(0x80, 64)
-                        self.rc.ForwardM1(0x81, 64)
+                        self.rc.ForwardM1(0x80, self.SPEED)
+                        self.rc.ForwardM1(0x81, self.SPEED)
                     elif msg == 'sd':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         # self.moco.sddiagonal(
                         #     drivetime=0.2, inputspeed='LOW')
-                        self.rc.BackwardM1(0x80, 64)
-                        self.rc.BackwardM1(0x81, 64)
+                        self.rc.BackwardM1(0x80, self.SPEED)
+                        self.rc.BackwardM1(0x81, self.SPEED)
                     elif msg == 'sa':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         # self.moco.sadiagonal(
                         #     drivetime=0.2, inputspeed='LOW')
-                        self.rc.BackwardM2(0x80, 64)
-                        self.rc.BackwardM2(0x81, 64)
+                        self.rc.BackwardM2(0x80, self.SPEED)
+                        self.rc.BackwardM2(0x81, self.SPEED)
                     elif msg == 'q':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         # self.moco.rotate(direction='COUNTER_CLOCKWISE',
                         #                  drivetime=0.2, inputspeed='LOW')
-                        self.rc.BackwardM2(0x80, 64)
-                        self.rc.ForwardM1(0x80, 64)
-                        self.rc.ForwardM2(0x81, 64)
-                        self.rc.BackwardM1(0x81, 64)
+                        self.rc.BackwardM2(0x80, self.SPEED)
+                        self.rc.ForwardM1(0x80, self.SPEED)
+                        self.rc.ForwardM2(0x81, self.SPEED)
+                        self.rc.BackwardM1(0x81, self.SPEED)
                     elif msg == 'e':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         # self.moco.rotate(direction='CLOCKWISE',
                         #                  drivetime=0.2, inputspeed='LOW')
-                        self.rc.BackwardM1(0x80, 64)
-                        self.rc.ForwardM2(0x80, 64)
-                        self.rc.ForwardM1(0x81, 64)
-                        self.rc.BackwardM2(0x81, 64)
+                        self.rc.BackwardM1(0x80, self.SPEED)
+                        self.rc.ForwardM2(0x80, self.SPEED)
+                        self.rc.ForwardM1(0x81, self.SPEED)
+                        self.rc.BackwardM2(0x81, self.SPEED)
                     elif msg == 'stop':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         # self.moco.stop()
