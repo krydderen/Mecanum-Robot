@@ -29,7 +29,7 @@ from utils.server import Server
 
 def rungame(queue: Queue, events: Event) -> NoReturn:
     """[summary]
-    Start and run the PYGAME window.
+    Start and run the PYGAME screendow.
     
     Args:
         queue ([type]): [description]
@@ -52,16 +52,17 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
         connected = False
         stopped = False
         run = True
-        win = pygame.display.set_mode(resolution, pygame.RESIZABLE)
+        screen = pygame.display.set_mode(resolution, pygame.RESIZABLE)
         pygame.display.set_caption("brom brom")
         pygame.init()
         pygame.joystick.init()
+        clock = pygame.time.Clock()
         
         
         while run:
             connected = server.isconnected()
 
-            pygame.time.delay(50)
+            # pygame.time.delay(50)
 
             currentevents = pygame.event.get()
 
@@ -70,7 +71,7 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
                     run = False
                 if event.type == pygame.VIDEORESIZE:
                     resolution = (event.w, event.h)
-                    win = pygame.display.set_mode(resolution,pygame.RESIZABLE)
+                    screen = pygame.display.set_mode(resolution,pygame.RESIZABLE)
             
             joystick_count = pygame.joystick.get_count()
 
@@ -165,6 +166,7 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
                 logging.debug('stop')
                 if connected:
                     # logging.debug('stop')
+                    server.send('stop')
                     server.send('stop') 
                 stopped = True
             else:
@@ -172,12 +174,13 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
             
             if connected:
                 frame = server.get_frame(resolution)
-                win.blit(frame, (0, 0))
+                screen.blit(frame, (0, 0))
             else:
-                win.fill('black')            
-            # win.fill('black')  # Fills the screen with black
-            pygame.draw.rect(win, (255, 0, 0), (x, y, width, height))
+                screen.fill('black')            
+            # screen.fill('black')  # Fills the screen with black
+            pygame.draw.rect(screen, (255, 0, 0), (x, y, width, height))
             pygame.display.update()
+            clock.tick(15)
 
         logging.debug("Closing server...")
         server.send("!DISCONNECT")
