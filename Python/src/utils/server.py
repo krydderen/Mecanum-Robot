@@ -15,7 +15,7 @@ import cv2, pickle, socket, struct, sys, logging, numpy, pygame
 from typing import NoReturn
 
 class DisconnectMsg(Exception):
-    """"Warning. Disconnecting clients and shutting down."""
+    """Warning. Disconnecting client and shutting down."""
 
 class Server(object):
     def __init__(self):
@@ -45,7 +45,7 @@ class Server(object):
         frame = pygame.transform.scale(self.frame, resolution)
         return frame
     
-    def start(self, queue: Queue, event: Event):
+    def start(self, queue: Queue, event: Event) -> None:
         while not event.is_set():
             try: 
                 self.server.listen()
@@ -95,12 +95,12 @@ class Server(object):
         try:
             # self.socket.settimeout(5)
             if message == "!DISCONNECT":
-                raise DisconnectMsg("Sending disconnect message to client.")
+                raise DisconnectMsg()
             senddata = pickle.dumps(message)
             self.conn.send(senddata)
             logging.info(f"Sent {message} to client.")
         except DisconnectMsg as e: # TODO: Test this method.
-            logging.exception(f"{e}")
+            logging.info(e.__doc__)
             self.close()
             # self.close()
         except Exception as e:
