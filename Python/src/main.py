@@ -180,7 +180,7 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
             pygame.display.update()
 
         logging.debug("Closing server...")
-        # server.send("!DISCONNECT")
+        server.send("!DISCONNECT")
         # TODO: Perhaps add a wait here to ensure server sends disconnect?
         # server.close()
         logging.debug("Closing game...")
