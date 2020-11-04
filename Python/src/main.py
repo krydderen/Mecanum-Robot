@@ -45,16 +45,16 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
         vel = 5*2
         drive_time = 0.2
         resolution = (640,480)
+        stick_L = (None,None)
+        buttons = None
         drive_speed = 'LOW'
         connected = False
         stopped = False
         run = True
-        pygame.init()
         win = pygame.display.set_mode(resolution, pygame.RESIZABLE)
         pygame.display.set_caption("brom brom")
-        joystick_count = pygame.joystick.get_count()
-        joystick = pygame.joystick.Joystick(0)
-        joystick.init()
+        pygame.init()
+        
         while run:
             connected = server.isconnected()
             # connected = False
@@ -168,8 +168,7 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
                 stopped = True
             else:
                 pass
-
- 
+            
             if connected:
                 frame = server.get_frame(resolution)
                 win.blit(frame, (0, 0))
