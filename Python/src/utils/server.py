@@ -11,7 +11,7 @@ Reference:
 from queue import Queue
 from threading import Event
 import threading
-import cv2, pickle, socket, struct, sys, logging
+import cv2, pickle, socket, struct, sys, logging, numpy, pygame
 from typing import NoReturn
 
 class DisconnectMsg(Exception):
@@ -33,7 +33,7 @@ class Server(object):
         self.payload_size = struct.calcsize("L")
         self.conn = ''
         self.addr = ''
-        self.frame= ''
+        self.frame= None
         
     def handle_client(self, conn: str, addr: str) -> NoReturn:
         self.logger.info(f"[NEW CONNECTION] {addr} connected.")
@@ -47,23 +47,30 @@ class Server(object):
 
                 data = data[self.payload_size:]
                 msg_size = struct.unpack("L", packed_msg_size)[0]
-                logging.debug(f"recieved: {msg_size}")
+                # logging.debug(f"recieved: {msg_size}")
 
                 while len(data) < msg_size:
                     data += conn.recv(self.HEADER)
                 frame_data = data[:msg_size]
                 data = data[msg_size:]
 
-                self.frame=pickle.loads(frame_data)
-                # logging.debug(frame.size)
+                frame=pickle.loads(frame_data)
+                frame=cv2.flip(frame, 0)
+                frame=cv2.flip(frame, 1)
+                frame = numpy.rot90(frame)
+                frame = frame[::-1]
+                frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
+                frame = pygame.surfarray.make_surface(frame)
+                self.frame = frame
+                # # logging.debug(frame.size)
                 # cv2.namedWindow('frame',cv2.WINDOW_NORMAL)
                 # cv2.resizeWindow('frame', 640,480)
-                # cv2.resizeWindow('frame', 1920,1080)
+                # # cv2.resizeWindow('frame', 1920,1080)
                 # cv2.imshow('frame', frame)
                 # if cv2.waitKey(10) & 0xFF == ord('q'):
                 #     cv2.destroyAllWindows()
                 #     conn.close()
-                #     break
+                    # break
                 
             except Exception as e:
                 self.logger.info(f"[ERROR] Closing.. {e}")
@@ -71,8 +78,9 @@ class Server(object):
                 break    
         conn.close()     
     
-    def get_frame(self):
-        return self.frame
+    def get_frame(self, resolution):
+        frame = pygame.transform.scale(self.frame, resolution)
+        return frame
     
     def start(self, queue: Queue, event: Event) -> NoReturn:
         while not event.is_set():

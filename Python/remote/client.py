@@ -25,7 +25,7 @@ from typing import NoReturn
 
 class Client(object):
     def __init__(self):
-        # TODO: DO THIS EVERYWHERE, GOOD CODING?
+        # TODO: DO THIS EVERYWHERE, GOOD CODING? ORRECT?
         self.HEADER : int = 4086
         self.PORT   : int = 8080
         self.FORMAT : str = 'utf-8'
