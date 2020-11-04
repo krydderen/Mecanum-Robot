@@ -34,11 +34,16 @@ class Server(object):
         self.conn = ''
         self.addr = ''
         self.frame= None
-        
+    
+    def close(self) -> NoReturn:
+        self.server.close()
+        self.thread.join()
+        self.connected = False
+    
     def handle_client(self, conn: str, addr: str) -> NoReturn:
         self.logger.info(f"[NEW CONNECTION] {addr} connected.")
         data = b''
-        while True:
+        while self.connected:
             try:
                 conn.settimeout(10)
                 while len(data) < self.payload_size:
@@ -76,7 +81,8 @@ class Server(object):
                 self.logger.info(f"[ERROR] Closing.. {e}")
                 self.logger.debug(f"[DEBUG] {e.with_traceback()}")
                 break    
-        conn.close()     
+        # conn.close()  
+        self.close()   
     
     def get_frame(self, resolution):
         frame = pygame.transform.scale(self.frame, resolution)
@@ -105,10 +111,7 @@ class Server(object):
             #     break
     
 
-    def close(self) -> NoReturn:
-        self.thread.join()
-        self.connected = False
-        self.server.close()
+    
     
     def isconnected(self) -> bool:
         return self.connected
@@ -123,7 +126,8 @@ class Server(object):
                 raise DisconnectMsg("Sending disconnect message to client.")
         except DisconnectMsg as e: # TODO: Test this method.
             logging.exception(f"{e}")
-            self.close()
+            self.connection = False
+            # self.close()
         except Exception as e:
             logging.exception(f"[ERROR] Failed to send message to client. \n {e}")
             # self.close()

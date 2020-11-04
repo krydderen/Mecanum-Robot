@@ -45,7 +45,8 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
         vel = 5*2
         drive_time = 0.2
         resolution = (640,480)
-        stick_L = (None,None)
+        stick = None
+        stick_L = (0,0)
         buttons = None
         drive_speed = 'LOW'
         connected = False
@@ -54,23 +55,15 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
         win = pygame.display.set_mode(resolution, pygame.RESIZABLE)
         pygame.display.set_caption("brom brom")
         pygame.init()
+        pygame.joystick.init()
+        
         
         while run:
             connected = server.isconnected()
-            # connected = False
-            # logging.debug(f"Server connection: {server.isconnected()}")
-            # if server.isconnected():
-            #     connected = True
 
             pygame.time.delay(50)
 
             currentevents = pygame.event.get()
-            
-            if pygame.joystick.get_count() > 0:
-                stick = pygame.joystick.Joystick(0)
-                stick.init()
-                buttons = stick.get_numbuttons()
-                stick_L = (stick.get_axis(0), stick.get_axis(1))
 
             for event in currentevents:
                 if event.type == pygame.QUIT:
@@ -78,6 +71,14 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
                 if event.type == pygame.VIDEORESIZE:
                     resolution = (event.w, event.h)
                     win = pygame.display.set_mode(resolution,pygame.RESIZABLE)
+            
+            joystick_count = pygame.joystick.get_count()
+
+            for i in range(joystick_count):
+                joystick = pygame.joystick.Joystick(i)
+                joystick.init()
+                buttons = stick.get_buttons()
+                stick_L = (stick.get_axis(0), stick.get_axis(1))
 
             keys = pygame.key.get_pressed()
 
@@ -92,57 +93,57 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
             #         drive_speed = 'LOW'
             #         logging.debug('Drive speed is now LOW')
 
-            if (keys[pygame.K_w] and keys[pygame.K_d]) or (
-                keys[pygame.K_UP] and keys[pygame.K_RIGHT]) or (
+            if ((keys[pygame.K_w] and keys[pygame.K_d]) or (
+                keys[pygame.K_UP] and keys[pygame.K_RIGHT]) or 
                 stick_L[0] > 0.3 and stick_L[1] < -0.3):
                 logging.debug('wd')
                 move = True;stopped = False
                 y -= vel;x += vel
                 if connected:
                     server.send('wd')
-            elif (keys[pygame.K_w] and keys[pygame.K_a]) or (
-                keys[pygame.K_UP] and keys[pygame.K_LEFT]) or (
+            elif ((keys[pygame.K_w] and keys[pygame.K_a]) or (
+                keys[pygame.K_UP] and keys[pygame.K_LEFT]) or
                 stick_L[0] < -0.3 and stick_L[1] < -0.3):
                 logging.debug('wa')
                 move = True;stopped = False
                 y -= vel;x -= vel
                 if connected:
                     server.send('wa')
-            elif (keys[pygame.K_s] and keys[pygame.K_d]) or (
-                keys[pygame.K_DOWN] and keys[pygame.K_RIGHT]) or (
+            elif ((keys[pygame.K_s] and keys[pygame.K_d]) or (
+                keys[pygame.K_DOWN] and keys[pygame.K_RIGHT]) or 
                 stick_L[0] > 0.3 and stick_L[1] > 0.3):
                 logging.debug('sd')
                 move = True;stopped = False
                 x += vel
                 if connected:
                     server.send('sd')
-            elif (keys[pygame.K_s] and keys[pygame.K_a]) or (
-                keys[pygame.K_DOWN] and keys[pygame.K_LEFT]) or (
+            elif ((keys[pygame.K_s] and keys[pygame.K_a]) or (
+                keys[pygame.K_DOWN] and keys[pygame.K_LEFT]) or 
                 stick_L[0] < -0.3 and stick_L[1] > 0.3):
                 logging.debug('sa')
                 move = True;stopped = False
                 y += vel;x -= vel
                 if connected:
                     server.send('sa')
-            elif keys[pygame.K_w] or keys[pygame.K_UP] or (stick_L[1] < -0.3):
+            elif keys[pygame.K_w] or keys[pygame.K_UP] or stick_L[1] < -0.3:
                 logging.debug('up')
                 move = True;stopped = False
                 y -= vel
                 if connected:
                     server.send('w')
-            elif keys[pygame.K_s] or keys[pygame.K_DOWN] or (stick_L[1] > 0.3):
+            elif keys[pygame.K_s] or keys[pygame.K_DOWN] or stick_L[1] > 0.3:
                 logging.debug('down')
                 move = True;stopped = False
                 y += vel
                 if connected:
                     server.send('s')
-            elif keys[pygame.K_a] or keys[pygame.K_LEFT] or (stick_L[0] <- 0.3):
+            elif keys[pygame.K_a] or keys[pygame.K_LEFT] or stick_L[0] <- 0.3:
                 logging.debug('left')
                 move = True;stopped = False
                 x -= vel
                 if connected:
                     server.send('a')
-            elif keys[pygame.K_d] or keys[pygame.K_RIGHT] or (stick_L[0] > 0.3):
+            elif keys[pygame.K_d] or keys[pygame.K_RIGHT] or stick_L[0] > 0.3:
                 logging.debug('right')
                 move = True;stopped = False
                 x += vel
@@ -179,7 +180,7 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
             pygame.display.update()
 
         logging.debug("Closing server...")
-        server.send("!DISCONNECT")
+        # server.send("!DISCONNECT")
         # TODO: Perhaps add a wait here to ensure server sends disconnect?
         # server.close()
         logging.debug("Closing game...")
