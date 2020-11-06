@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
 
-"""[summary]
+"""
 Main interface for controlling the Mecanum-Robot model.
-- - S C R I P T  D O C S T R I N G  W I P - -
+This script runs a method 'rungame' which takes in a Queue
+and Event. These args are necessary when driving threadPool-
+executors, due to the necessity of knowing which thread goes where.
+
 Reference:
     https://realpython.com/documenting-python-code/
 """
@@ -13,23 +16,21 @@ import logging
 import queue
 import threading
 import pygame
-import numpy
-import cv2
 from threading import Event
 from queue import Queue
-from time import sleep
 from concurrent.futures import ThreadPoolExecutor
 from typing import NoReturn
-
 from pygame.constants import RESIZABLE
 
 # Importing utils
 from utils.server import Server
 
-
 def rungame(queue: Queue, events: Event) -> NoReturn:
     """[summary]
-    Start and run the PYGAME screendow.
+    This method is the soul and main controller of the project.
+    Within this method, you create a GUI 'game' where you 
+    interact with the robot once the robot is connected.
+    You also gain vision through connection of said robot.
     
     Args:
         queue ([type]): [description]
@@ -38,20 +39,20 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
     while not events.is_set():
         
 
-        x = 50
-        y = 50
-        width = 40
-        height = 60
-        vel = 5*2
-        drive_time = 0.2
-        resolution = (640,480)
-        stick = None
-        stick_L = (0,0)
-        buttons = None
-        drive_speed = 'LOW'
-        connected = False
-        stopped = False
-        run = True
+        x           : int   = 50
+        y           : int   = 50
+        vel         : int   = 5*2
+        width       : int   = 40
+        height      : int   = 60
+        drive_time  : int   = 0.2
+        stick_L     : tuple = (0,0)
+        resolution  : tuple = (640,480)
+        run         : bool  = True
+        move        : bool  = False 
+        stopped     : bool  = False
+        connected   : bool  = False
+        drive_speed : str   = 'LOW'
+        
         screen = pygame.display.set_mode(resolution, pygame.RESIZABLE)
         pygame.display.set_caption("brom brom")
         pygame.init()
@@ -60,12 +61,15 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
         
         
         while run:
+            #-----------------------------------------------
+            #---------Check if connection is active---------
             connected = server.isconnected()
 
             # pygame.time.delay(50)
 
+            # Get the current events happening on screen
+            # and treat each individual input as designed
             currentevents = pygame.event.get()
-
             for event in currentevents:
                 if event.type == pygame.QUIT:
                     run = False
@@ -73,16 +77,18 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
                     resolution = (event.w, event.h)
                     screen = pygame.display.set_mode(resolution,pygame.RESIZABLE)
             
+            # Check for any joystick inputs 
             joystick_count = pygame.joystick.get_count()
-
             for i in range(joystick_count):
                 joystick = pygame.joystick.Joystick(i)
                 joystick.init()
-                buttons = stick.get_buttons()
-                stick_L = (stick.get_axis(0), stick.get_axis(1))
-
+                # buttons = joystick.get_button()
+                stick_L = (joystick.get_axis(0), joystick.get_axis(1))
+            
+            # Fetch the current keys registered
             keys = pygame.key.get_pressed()
 
+            # Set move to false because we have not moved yet.
             move = False
 
             # # Change motor speed to high or low.
@@ -94,6 +100,10 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
             #         drive_speed = 'LOW'
             #         logging.debug('Drive speed is now LOW')
 
+            # Check both arrow and wasd keys for flags. 
+            # If no flags on them, check joystick.
+            # If connected, send cmd to client.
+            # Flag for going northeast
             if ((keys[pygame.K_w] and keys[pygame.K_d]) or (
                 keys[pygame.K_UP] and keys[pygame.K_RIGHT]) or 
                 stick_L[0] > 0.3 and stick_L[1] < -0.3):
@@ -102,6 +112,7 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
                 y -= vel;x += vel
                 if connected:
                     server.send('wd')
+            # Flag for going northwest
             elif ((keys[pygame.K_w] and keys[pygame.K_a]) or (
                 keys[pygame.K_UP] and keys[pygame.K_LEFT]) or
                 stick_L[0] < -0.3 and stick_L[1] < -0.3):
@@ -110,6 +121,7 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
                 y -= vel;x -= vel
                 if connected:
                     server.send('wa')
+            # Flag for going southeast
             elif ((keys[pygame.K_s] and keys[pygame.K_d]) or (
                 keys[pygame.K_DOWN] and keys[pygame.K_RIGHT]) or 
                 stick_L[0] > 0.3 and stick_L[1] > 0.3):
@@ -118,6 +130,7 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
                 x += vel
                 if connected:
                     server.send('sd')
+            # Flag for going southwest
             elif ((keys[pygame.K_s] and keys[pygame.K_a]) or (
                 keys[pygame.K_DOWN] and keys[pygame.K_LEFT]) or 
                 stick_L[0] < -0.3 and stick_L[1] > 0.3):
@@ -126,62 +139,78 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
                 y += vel;x -= vel
                 if connected:
                     server.send('sa')
-            elif keys[pygame.K_w] or keys[pygame.K_UP] or stick_L[1] < -0.3:
+            # Flag for going forward/north
+            elif (keys[pygame.K_w] or keys[pygame.K_UP] or
+                  stick_L[1] < -0.3):
                 logging.debug('up')
                 move = True;stopped = False
                 y -= vel
                 if connected:
                     server.send('w')
-            elif keys[pygame.K_s] or keys[pygame.K_DOWN] or stick_L[1] > 0.3:
+            # Flag for going south/down
+            elif (keys[pygame.K_s] or keys[pygame.K_DOWN] or
+                  stick_L[1] > 0.3):
                 logging.debug('down')
                 move = True;stopped = False
                 y += vel
                 if connected:
                     server.send('s')
-            elif keys[pygame.K_a] or keys[pygame.K_LEFT] or stick_L[0] <- 0.3:
+            # Flag for going left/west
+            elif (keys[pygame.K_a] or keys[pygame.K_LEFT] or
+                  stick_L[0] <- 0.3):
                 logging.debug('left')
                 move = True;stopped = False
                 x -= vel
                 if connected:
                     server.send('a')
-            elif keys[pygame.K_d] or keys[pygame.K_RIGHT] or stick_L[0] > 0.3:
+            # Flag for going right/east
+            elif (keys[pygame.K_d] or keys[pygame.K_RIGHT] or
+                  stick_L[0] > 0.3):
                 logging.debug('right')
                 move = True;stopped = False
                 x += vel
                 if connected:
                     server.send('d')
-            elif keys[pygame.K_q] or (buttons == 4):
+            # Flag for rotating counterclockwise
+            elif keys[pygame.K_q]:
                 logging.debug('counterclockwise')
                 move = True;stopped = False
                 if connected:
                     server.send('q')
-            elif keys[pygame.K_e] or (buttons == 5):
+            # Flag for rotating clockwise
+            elif keys[pygame.K_e]:
                 logging.debug('clockwise')
                 move = True;stopped = False
                 if connected:
                     server.send('e')
 
+            # Check move and stop for flags
+            # If none are true, no new inputs are detected and
+            # thus we stop the robot
             if move == False and stopped == False: 
-                # mc.stop()
                 logging.debug('stop')
                 if connected:
-                    # logging.debug('stop')
-                    server.send('stop')
                     server.send('stop') 
                 stopped = True
             else:
                 pass
             
+            # If connected, fill the background with the videostream
+            # If not, just fill it with black
             if connected:
                 frame = server.get_frame(resolution)
                 screen.blit(frame, (0, 0))
             else:
                 screen.fill('black')            
-            # screen.fill('black')  # Fills the screen with black
+                
+            # Using a little red rectangle for movement visualisation
             pygame.draw.rect(screen, (255, 0, 0), (x, y, width, height))
+            #Update the screen and set framerate
             pygame.display.update()
             clock.tick(15)
 
+        # Send warningflags to stop the server and client.
+        # After this has been done, close the game properly.
         logging.debug("Closing server...")
         server.send("!DISCONNECT")
         # TODO: Perhaps add a wait here to ensure server sends disconnect?
@@ -191,12 +220,16 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
         break
 
 
+# ---------- MAIN LOOP ----------
 if __name__ == '__main__':
+    # Set basic logging configuration.
     logging.basicConfig(format='%(asctime)s - %(message)s',
                         level=logging.DEBUG)
 
+    # Initialize the server object.
     server = Server()
 
+    # Set up the threading environment with threadPoolExecutor.
     pipeline = queue.Queue(maxsize=5)
     event = threading.Event()
     with ThreadPoolExecutor(max_workers=2) as executor:

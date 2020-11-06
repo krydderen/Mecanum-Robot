@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
 #-*- coding: utf-8 -*-
 
-"""[summary]
-SERVER DOCSTRING
-- - S C R I P T  D O C S T R I N G  W I P - -
+"""
+This class initializes and behaves like a server.
+Its sole purpose is to handle the read and send 
+functions. The send function sends a CMD to the client,
+whereas the read method ( start )  handles the incoming
+data as an image array, converts it to proper format.
+The main module can then access the frame whenever it
+is accessible.
+
 Reference:
     https://realpython.com/documenting-python-code/
 """
@@ -14,18 +20,30 @@ import threading
 import cv2, pickle, socket, struct, sys, logging, numpy, pygame
 from typing import NoReturn
 
+# Initialize custom exception class
 class DisconnectMsg(Exception):
     """Warning. Disconnecting client and shutting down."""
 
 class Server(object):
+    """
+    A class used to represent a Server.
+    The server will be initialized through ThreadPoolExecutor
+    and runned as daemon. This means that as soon as the job is done, 
+    the thread will terminate itself completely.
+    Args:
+        object ([type]): Socket Object which acts as an server.
+    """
     def __init__(self):
-        self.HEADER  = 4086
-        self.PORT    = 8080
-        self.FORMAT  = 'utf-8'
+        self.HEADER  : int =  4086
+        self.PORT    : int = 8080
+        self.FORMAT  : str = 'utf-8'
         self.SERVER  = socket.gethostbyname(socket.gethostname())
-        self.ADDR    = (self.SERVER,self.PORT)
+        self.ADDR    : tuple = (self.SERVER,self.PORT)
+        # - - - - Set basic logging config - - - - - - - -
         logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.DEBUG)
         self.logger = logging.getLogger(__name__)
+        
+        # - - - - Initialize socket and bind - - - - - - - -
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.logger.info("[SERVER] Socket created.")
         self.server.settimeout(30)
@@ -37,15 +55,39 @@ class Server(object):
         self.frame= None
     
     def close(self) -> NoReturn:
+        """
+        Shuts the server down.
+        """
         self.server.close()
         self.thread.join()
         self.connected = False
     
-    def get_frame(self, resolution):
+    def get_frame(self, resolution) -> any:
+        """
+        Transforms the frame to suit the format
+        of the GUI.
+        Args:
+            resolution (tuple): The set resolution we want
+            the frame to be.
+
+        Returns:
+            any: The formatted frame.
+        """
         frame = pygame.transform.scale(self.frame, resolution)
         return frame
     
     def start(self, queue: Queue, event: Event) -> None:
+        """
+        The method starts by listening for a client to connect.
+        When a client connects, start receiving data from said client.
+        After data is received, unpacks it and formats it to suit
+        the GUI format. This also includes reversing the received array,
+        rotating it, flipping it and sets it as the current given frame.
+        
+        Args:
+            queue (Queue): [description]
+            event (Event): [description]
+        """
         while not event.is_set():
             try: 
                 self.server.listen()
@@ -92,6 +134,17 @@ class Server(object):
         return self.connected
     
     def send(self, message: str) -> NoReturn:
+        """
+        Formats and sends the given CMD to the client. 
+
+        Args:
+            message (str): CMD, given in a format of
+            'wasdqe' or 'stop'.
+
+        Raises:
+            DisconnectMsg: Raises custom exception if 
+            a disconnect message is received.
+        """
         try:
             # self.socket.settimeout(5)
             if message == "!DISCONNECT":
