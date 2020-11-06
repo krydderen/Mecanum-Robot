@@ -8,12 +8,12 @@ win = pygame.display.set_mode((500, 500))
 pygame.display.set_caption("brom brom")
 
 rc = Roboclaw("/dev/ttyS0", 38400)
-addresses = [0x80,0x81]
+addresses = [0x80, 0x81]
 sleep(0.2)
 speed = 64
 rc.Open()
 
-logging.basicConfig(format='%(asctime)s - %(message)s',level=logging.DEBUG)
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.DEBUG)
 x = 50
 y = 50
 width = 40
@@ -109,20 +109,20 @@ while run:
         move = True
         stopped = False
         x -= vel
-        rc.BackwardM2(0x80,64)
-        rc.ForwardM1(0x80,64)
-        rc.ForwardM1(0x81,64)
-        rc.BackwardM2(0x81,64)
+        rc.BackwardM2(0x80, 64)
+        rc.ForwardM1(0x80, 64)
+        rc.ForwardM1(0x81, 64)
+        rc.BackwardM2(0x81, 64)
         # mc.left(drivetime = drive_time, inputspeed = drive_speed)
     elif keys[pygame.K_d] or keys[pygame.K_RIGHT]:
         logging.debug('right')
         move = True
         stopped = False
         x += vel
-        rc.BackwardM1(0x80,64)
-        rc.ForwardM2(0x80,64)
-        rc.ForwardM2(0x81,64)
-        rc.BackwardM1(0x81,64)
+        rc.BackwardM1(0x80, 64)
+        rc.ForwardM2(0x80, 64)
+        rc.ForwardM2(0x81, 64)
+        rc.BackwardM1(0x81, 64)
         # mc.right(drivetime = drive_time, inputspeed = drive_speed)
     elif keys[pygame.K_q]:
         logging.debug('counterclockwise')
@@ -133,7 +133,7 @@ while run:
         rc.ForwardM2(0x81, 64)
         rc.BackwardM1(0x81, 64)
         # mc.rotate(direction = 'COUNTER_CLOCKWISE',drivetime = drive_time,
-                #   inputspeed = drive_speed)
+        #   inputspeed = drive_speed)
     elif keys[pygame.K_e]:
         logging.debug('clockwise')
         move = True
@@ -143,21 +143,21 @@ while run:
         rc.ForwardM1(0x81, 64)
         rc.BackwardM2(0x81, 64)
         # mc.rotate(direction = 'CLOCKWISE',drivetime = drive_time,
-                #   inputspeed = drive_speed)
+        #   inputspeed = drive_speed)
 
-    if move == False and stopped == False: 
-        #mc.stop()
+    if move == False and stopped == False:
+        # mc.stop()
         logging.debug('stop')
-        rc.ForwardM1(0x80,0)
-        rc.ForwardM2(0x80,0)
-        rc.BackwardM1(0x80,0)
-        rc.BackwardM2(0x80,0)
-        rc.ForwardM1(0x81,0)
-        rc.ForwardM2(0x81,0)
-        rc.BackwardM1(0x81,0)
-        rc.BackwardM2(0x81,0)
+        rc.ForwardM1(0x80, 0)
+        rc.ForwardM2(0x80, 0)
+        rc.BackwardM1(0x80, 0)
+        rc.BackwardM2(0x80, 0)
+        rc.ForwardM1(0x81, 0)
+        rc.ForwardM2(0x81, 0)
+        rc.BackwardM1(0x81, 0)
+        rc.BackwardM2(0x81, 0)
         stopped = True
-        
+
     else:
         pass
 

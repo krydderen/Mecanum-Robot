@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 """
 This class initializes and behaves like a server.
@@ -17,12 +17,22 @@ Reference:
 from queue import Queue
 from threading import Event
 import threading
-import cv2, pickle, socket, struct, sys, logging, numpy, pygame
+import cv2
+import pickle
+import socket
+import struct
+import sys
+import logging
+import numpy
+import pygame
 from typing import NoReturn
 
 # Initialize custom exception class
+
+
 class DisconnectMsg(Exception):
     """Warning. Disconnecting client and shutting down."""
+
 
 class Server(object):
     """
@@ -33,16 +43,18 @@ class Server(object):
     Args:
         object ([type]): Socket Object which acts as an server.
     """
+
     def __init__(self):
-        self.HEADER  : int =  4086
-        self.PORT    : int = 8080
-        self.FORMAT  : str = 'utf-8'
-        self.SERVER  = socket.gethostbyname(socket.gethostname())
-        self.ADDR    : tuple = (self.SERVER,self.PORT)
+        self.HEADER: int = 4086
+        self.PORT: int = 8080
+        self.FORMAT: str = 'utf-8'
+        self.SERVER = socket.gethostbyname(socket.gethostname())
+        self.ADDR: tuple = (self.SERVER, self.PORT)
         # - - - - Set basic logging config - - - - - - - -
-        logging.basicConfig(format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.DEBUG)
+        logging.basicConfig(format='%(asctime)s - %(message)s',
+                            datefmt='%d-%b-%y %H:%M:%S', level=logging.DEBUG)
         self.logger = logging.getLogger(__name__)
-        
+
         # - - - - Initialize socket and bind - - - - - - - -
         self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.logger.info("[SERVER] Socket created.")
@@ -52,8 +64,8 @@ class Server(object):
         self.payload_size = struct.calcsize("L")
         self.conn = ''
         self.addr = ''
-        self.frame= None
-    
+        self.frame = None
+
     def close(self) -> NoReturn:
         """
         Shuts the server down.
@@ -61,7 +73,7 @@ class Server(object):
         self.server.close()
         self.thread.join()
         self.connected = False
-    
+
     def get_frame(self, resolution) -> any:
         """
         Transforms the frame to suit the format
@@ -75,7 +87,7 @@ class Server(object):
         """
         frame = pygame.transform.scale(self.frame, resolution)
         return frame
-    
+
     def start(self, queue: Queue, event: Event) -> None:
         """
         The method starts by listening for a client to connect.
@@ -83,13 +95,13 @@ class Server(object):
         After data is received, unpacks it and formats it to suit
         the GUI format. This also includes reversing the received array,
         rotating it, flipping it and sets it as the current given frame.
-        
+
         Args:
             queue (Queue): [description]
             event (Event): [description]
         """
         while not event.is_set():
-            try: 
+            try:
                 self.server.listen()
                 self.logger.info(f"Server is listening on {self.ADDR}")
                 self.conn, self.addr = self.server.accept()
@@ -116,23 +128,23 @@ class Server(object):
                     frame_data = data[:msg_size]
                     data = data[msg_size:]
 
-                    frame=pickle.loads(frame_data)
-                    frame=cv2.flip(frame, 0)
-                    frame=cv2.flip(frame, 1)
+                    frame = pickle.loads(frame_data)
+                    frame = cv2.flip(frame, 0)
+                    frame = cv2.flip(frame, 1)
                     frame = numpy.rot90(frame)
                     frame = frame[::-1]
-                    frame = cv2.cvtColor(frame,cv2.COLOR_BGR2RGB)
+                    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                     frame = pygame.surfarray.make_surface(frame)
                     self.frame = frame
-                    
+
                 except Exception as e:
                     self.logger.info(f"[ERROR] Closing.. {e}")
                     self.logger.debug(f"[DEBUG] {e.with_traceback()}")
         return
-    
+
     def isconnected(self) -> bool:
         return self.connected
-    
+
     def send(self, message: str) -> NoReturn:
         """
         Formats and sends the given CMD to the client. 
@@ -152,13 +164,11 @@ class Server(object):
             senddata = pickle.dumps(message)
             self.conn.send(senddata)
             logging.info(f"Sent {message} to client.")
-        except DisconnectMsg as e: # TODO: Test this method.
+        except DisconnectMsg as e:
             logging.info(e.__doc__)
             self.close()
             # self.close()
         except Exception as e:
-            logging.exception(f"[ERROR] Failed to send message to client. \n {e}")
+            logging.exception(
+                f"[ERROR] Failed to send message to client. \n {e}")
             # self.close()
-            
-            
-            

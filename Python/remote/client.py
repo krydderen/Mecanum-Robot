@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-#-*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 
 """
 Script for client class and its methods for both 
@@ -33,21 +33,22 @@ class Client(object):
     Args:
         object ([type]): Socket Object which acts as an client.
     """
+
     def __init__(self):
         """
         Initialized parameters.
-        
+
         HEADER : int
 
         """
         # TODO: DO THIS EVERYWHERE, GOOD CODING? ORRECT?
-        self.HEADER : int   = 4086
-        self.PORT   : int   = 8080
-        self.FORMAT : str   = 'utf-8'
-        self.SERVER : str   = '192.168.43.18'
-        self.ADDR   : tuple = (self.SERVER, self.PORT)
-        self.socket : any   = None  
-        self.connected : bool = False
+        self.HEADER: int = 4086
+        self.PORT: int = 8080
+        self.FORMAT: str = 'utf-8'
+        self.SERVER: str = '192.168.43.18'
+        self.ADDR: tuple = (self.SERVER, self.PORT)
+        self.socket: any = None
+        self.connected: bool = False
         # - - - - Set basic logging config - - - - - - - -
         logging.basicConfig(format='%(asctime)s - %(message)s',
                             datefmt='%d-%b-%y %H:%M:%S', level=logging.DEBUG)
@@ -92,7 +93,7 @@ class Client(object):
         flagged not to. Its only purpose is to read and process the 
         image from the raspberry pi camera module. After it is read,
         convert it to GRAY to reduce amount of data sent.
-        
+
         Args:
             queue (Queue): [description]
             event (Event): [description]
@@ -103,7 +104,7 @@ class Client(object):
         while not event.is_set():
             while self.connected:
                 try:
-                    cv2.waitKey(100) 
+                    cv2.waitKey(100)
                     _, self.frame = self.cap.read()
                     frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
                     data = pickle.dumps(frame)
@@ -120,21 +121,21 @@ class Client(object):
         server comes in form of aswdqe or 'stop'. After received, the
         msg is processed and passed into the if-statements to check
         what direction/move the robot should do next.
-        
+
         Args:
             queue (Queue): [description]
             event (Event): [description]
         """
         while not event.is_set():
             while True:
-                data = self.socket.recv(self.HEADER)  
+                data = self.socket.recv(self.HEADER)
                 msg = pickle.loads(data)
                 try:
-                    #---------- Debugging ----------
+                    # ---------- Debugging ----------
                     logging.info(f"Server sent data: {msg}")
                     logging.debug(f"data: {data}")
                     logging.debug(f"msg: {msg}")
-                    #-------------------------------
+                    # -------------------------------
                     if msg == 'w':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
                         self.rc.ForwardM1(0x80, self.SPEED)
@@ -144,10 +145,10 @@ class Client(object):
                         logging.debug(f"Sent command to MOCO. |{msg}| ")
                     elif msg == 'a':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.rc.BackwardM2(0x80,self.SPEED)
-                        self.rc.ForwardM1(0x80,self.SPEED)
-                        self.rc.ForwardM1(0x81,self.SPEED)
-                        self.rc.BackwardM2(0x81,self.SPEED)
+                        self.rc.BackwardM2(0x80, self.SPEED)
+                        self.rc.ForwardM1(0x80, self.SPEED)
+                        self.rc.ForwardM1(0x81, self.SPEED)
+                        self.rc.BackwardM2(0x81, self.SPEED)
                         logging.debug(f"Sent command to MOCO. |{msg}| ")
                     elif msg == 's':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
@@ -158,10 +159,10 @@ class Client(object):
                         logging.debug(f"Sent command to MOCO. |{msg}| ")
                     elif msg == 'd':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.rc.BackwardM1(0x80,self.SPEED)
-                        self.rc.ForwardM2(0x80,self.SPEED)
-                        self.rc.ForwardM2(0x81,self.SPEED)
-                        self.rc.BackwardM1(0x81,self.SPEED)
+                        self.rc.BackwardM1(0x80, self.SPEED)
+                        self.rc.ForwardM2(0x80, self.SPEED)
+                        self.rc.ForwardM2(0x81, self.SPEED)
+                        self.rc.BackwardM1(0x81, self.SPEED)
                         logging.debug(f"Sent command to MOCO. |{msg}| ")
                     elif msg == 'wd':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
@@ -193,20 +194,20 @@ class Client(object):
                         self.rc.BackwardM2(0x81, self.SPEED)
                     elif msg == 'stop':
                         logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.rc.ForwardM1(0x80,0)
-                        self.rc.ForwardM2(0x80,0)
-                        self.rc.BackwardM1(0x80,0)
-                        self.rc.BackwardM2(0x80,0)
-                        self.rc.ForwardM1(0x81,0)
-                        self.rc.ForwardM2(0x81,0)
-                        self.rc.BackwardM1(0x81,0)
-                        self.rc.BackwardM2(0x81,0)
+                        self.rc.ForwardM1(0x80, 0)
+                        self.rc.ForwardM2(0x80, 0)
+                        self.rc.BackwardM1(0x80, 0)
+                        self.rc.BackwardM2(0x80, 0)
+                        self.rc.ForwardM1(0x81, 0)
+                        self.rc.ForwardM2(0x81, 0)
+                        self.rc.BackwardM1(0x81, 0)
+                        self.rc.BackwardM2(0x81, 0)
                         logging.debug(f"Sent command to MOCO. |{msg}| ")
-                        
+
                     # TODO: Test this method.
                     # elif msg == '!DISCONNECT':
                     #     logging.debug(f"Disconnecting..")
-                    #     self.disconnect()                        
+                    #     self.disconnect()
                 except Exception as e:
                     logging.debug(f"Exception occured: {e}")
                     logging.debug(e.with_traceback())
@@ -224,7 +225,6 @@ if __name__ == '__main__':
     client.start()
     logging.debug("Started Client")
 
-    
     # Set up the threading environment with threadPoolExecutor.
     pipeline = queue.Queue(maxsize=5)
     event = threading.Event()
