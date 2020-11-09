@@ -59,7 +59,7 @@ def rungame(queue: Queue, event: Event) -> NoReturn:
         pygame.joystick.init()
         clock = pygame.time.Clock()
 
-        while run:
+        while run and event.is_set():
             # -----------------------------------------------
             # ---------Check if connection is active---------
             connected = server.isconnected()

@@ -214,7 +214,6 @@ class Client(object):
                     self.disconnect()
             except Exception as e:
                 logging.debug(f"Exception occured: {e}")
-                logging.debug(e.with_traceback())
                 event.set()
 
 
