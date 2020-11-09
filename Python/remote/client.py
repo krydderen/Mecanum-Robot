@@ -203,7 +203,9 @@ class Client(object):
                     self.rc.BackwardM1(0x81, 0)
                     self.rc.BackwardM2(0x81, 0)
                     logging.debug(f"Sent command to MOCO. |{msg}| ")
-
+                if 'speed' == msg[0]:
+                    logging.debug(f"Changing robotspeed. |{msg}| ")
+                    self.SPEED = msg[1]
                 # TODO: Test this method.
                 elif msg == '!DISCONNECT':
                     logging.debug(f"Disconnecting..")
