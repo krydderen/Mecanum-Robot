@@ -92,6 +92,7 @@ def rungame(queue: Queue, event: Event) -> NoReturn:
 
             # # Change motor speed to high or low.
             if keys[pygame.K_t]:
+                speed : int = 0
                 try:
                     speed = (input("set speed from 0 to 100: "))
                     if not type(speed) is int:

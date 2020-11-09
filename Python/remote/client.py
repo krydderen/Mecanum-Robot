@@ -41,11 +41,11 @@ class Client(object):
 
         """
         # TODO: DO THIS EVERYWHERE, GOOD CODING? ORRECT?
-        self.HEADER: int = 4086
-        self.PORT: int = 8080
-        self.FORMAT: str = 'utf-8'
-        self.SERVER: str = '192.168.43.18'
-        self.ADDR: tuple = (self.SERVER, self.PORT)
+        self.HEADER : int = 4086
+        self.PORT   : int = 8080
+        self.FORMAT : str = 'utf-8'
+        self.SERVER : str = '192.168.43.18'
+        self.ADDR   : tuple = (self.SERVER, self.PORT)
         self.socket: any = None
         self.connected: bool = False
         # - - - - Set basic logging config - - - - - - - -
