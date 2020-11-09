@@ -39,12 +39,16 @@ class TextInputBox(pygame.sprite.Sprite):
 
     def render_text(self):
         t_surf = self.font.render(self.text, True, self.color, self.backcolor)
-        self.image = pygame.Surface((max(self.width, t_surf.get_width()+10), t_surf.get_height()+10), pygame.SRCALPHA)
+        self.image = pygame.Surface((max(self.width, t_surf.get_width()+20), t_surf.get_height()+10), pygame.SRCALPHA)
         if self.backcolor:
             self.image.fill(self.backcolor)
-        self.image.blit(t_surf, (5, 5))
-        pygame.draw.rect(self.image, self.color, self.image.get_rect().inflate(-2, -2), 2)
-        self.rect = self.image.get_rect(topleft = self.pos)
+        if self.active:
+            self.image.blit(t_surf, (5, 5))
+            pygame.draw.rect(self.image, self.color, self.image.get_rect(),2)
+            self.rect = self.image.get_rect(topleft = self.pos)
+        else:
+            pass
+        
 
 def rungame(queue: Queue, event: Event) -> None:
     """[summary]
@@ -64,6 +68,7 @@ def rungame(queue: Queue, event: Event) -> None:
     vel: int = 5*2
     width: int = 40
     height: int = 60
+    speed: int = 100
     drive_time: int = 0.2
     deadzone : float = 0.5
     stick_L: tuple = (0, 0)
@@ -72,7 +77,6 @@ def rungame(queue: Queue, event: Event) -> None:
     move: bool = False
     stopped: bool = False
     connected: bool = False
-    drive_speed: str = 'LOW'
     
 
 
@@ -81,10 +85,13 @@ def rungame(queue: Queue, event: Event) -> None:
     pygame.init()
     pygame.joystick.init()
     clock = pygame.time.Clock()
-    font = pygame.font.SysFont(None, 100)
-    text_input_box = TextInputBox(50, 50, 400, font)
-    
+    font = pygame.font.SysFont(None, 50)
+    text_input_box = TextInputBox(10, 10, 50, font)
     group = pygame.sprite.Group(text_input_box)
+    
+    text = font.render(f'SPEED: {speed}', True, (255, 255, 255), None)
+    textRect = text.get_rect()
+    
 
 
     while run:
@@ -104,23 +111,28 @@ def rungame(queue: Queue, event: Event) -> None:
                 resolution = (event.w, event.h)
                 screen = pygame.display.set_mode(
                     resolution, pygame.RESIZABLE)
-            if event.type == pygame.USEREVENT:
-                if (event.user_type == pygame_gui.UI_TEXT_ENTRY_FINISHED and 
-                    event.ui_object_id == '#main_text_entry'):
-                    print(event.text)
             # ! TESTING GUI
-            if event.type == pygame.MOUSEBUTTONDOWN and not text_input_box.active:
-                text_input_box.active = text_input_box.rect.collidepoint(event.pos)
-            if event.type == pygame.KEYDOWN and text_input_box.active:
-                if event.key == pygame.K_RETURN:
-                    text_input_box.active = False
-                    print(f"final text {text_input_box.text}")
-                elif event.key == pygame.K_BACKSPACE:
-                    text_input_box.text = text_input_box.text[:-1]
-                else:
-                    text_input_box.text += event.unicode
-                    # print(text_input_box.text)
-                text_input_box.render_text()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE and not text_input_box.active:
+                    text_input_box.active = 1
+                if event.type == pygame.KEYDOWN and text_input_box.active:
+                    if event.key == pygame.K_RETURN:
+                        text_input_box.active = False
+                        print(f"final text {text_input_box.text}")
+                        try:
+                            speed = int(text_input_box.text)
+                            text = font.render(f'SPEED: {speed}', True, (255, 255, 255), None)
+                            if connected:
+                                server.send(['speed', speed])
+                        except:
+                            pass
+                        text_input_box.text = ''
+                    elif event.key == pygame.K_BACKSPACE:
+                        text_input_box.text = text_input_box.text[:-1]
+                    else:
+                        text_input_box.text += event.unicode
+                        # print(text_input_box.text)
+                    text_input_box.render_text()
             # ! TESTING
                 
         # Check for any joystick inputs
@@ -155,9 +167,7 @@ def rungame(queue: Queue, event: Event) -> None:
         #     msg = ['speed', speed]
         #     server.send(msg)
         if keys[pygame.K_t] and connected:
-            speed = 0
-            msg = ['speed', speed]
-            server.send(msg)
+                text_input_box.active = 1
                 
             
         
@@ -281,8 +291,12 @@ def rungame(queue: Queue, event: Event) -> None:
 
         # Using a little red rectangle for movement visualisation
         pygame.draw.rect(screen, (255, 0, 0), (x, y, width, height))
-        group.draw(screen)
+        if text_input_box.active:
+            group.draw(screen)
         # Update the screen and set framerate
+        
+        textRect.bottomright = (resolution[0]-10, resolution[1]-10)
+        screen.blit(text,textRect)
         pygame.display.update()
         clock.tick(15)
 
