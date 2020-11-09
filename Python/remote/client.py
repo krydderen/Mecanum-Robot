@@ -128,9 +128,10 @@ class Client(object):
         """
         while not event.is_set():
             
-            data = self.socket.recv(self.HEADER)
-            msg = pickle.loads(data)
+            
             try:
+                data = self.socket.recv(self.HEADER)
+                msg = pickle.loads(data)
                 # ---------- Debugging ----------
                 logging.info(f"Server sent data: {msg}")
                 logging.debug(f"data: {data}")
@@ -214,6 +215,7 @@ class Client(object):
             except Exception as e:
                 logging.debug(f"Exception occured: {e}")
                 logging.debug(e.with_traceback())
+                event.set()
 
 
 # ---------- MAIN LOOP ----------
