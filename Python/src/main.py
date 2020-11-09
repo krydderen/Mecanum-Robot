@@ -20,10 +20,35 @@ from threading import Event
 from queue import Queue
 from typing import NoReturn
 from pygame.constants import RESIZABLE
+import pygame_gui
 
 # Importing utils
 from utils.server import Server
 
+class TextInputBox(pygame.sprite.Sprite):
+    def __init__(self, x, y, w, font):
+        super().__init__()
+        self.color = (255, 255, 255)
+        self.backcolor = None
+        self.pos = (x, y) 
+        self.width = w
+        self.font = font
+        self.active = False
+        self.text = ""
+        self.render_text()
+
+    def render_text(self):
+        t_surf = self.font.render(self.text, True, self.color, self.backcolor)
+        self.image = pygame.Surface((max(self.width, t_surf.get_width()+20), t_surf.get_height()+10), pygame.SRCALPHA)
+        if self.backcolor:
+            self.image.fill(self.backcolor)
+        if self.active:
+            self.image.blit(t_surf, (5, 5))
+            pygame.draw.rect(self.image, self.color, self.image.get_rect(),2)
+            self.rect = self.image.get_rect(topleft = self.pos)
+        else:
+            pass
+        
 
 def rungame(queue: Queue, event: Event) -> None:
     """[summary]
@@ -43,6 +68,7 @@ def rungame(queue: Queue, event: Event) -> None:
     vel: int = 5*2
     width: int = 40
     height: int = 60
+    speed: int = 100
     drive_time: int = 0.2
     deadzone : float = 0.5
     stick_L: tuple = (0, 0)
@@ -51,13 +77,22 @@ def rungame(queue: Queue, event: Event) -> None:
     move: bool = False
     stopped: bool = False
     connected: bool = False
-    drive_speed: str = 'LOW'
+    
+
 
     screen = pygame.display.set_mode(resolution, pygame.RESIZABLE)
     pygame.display.set_caption("brom brom")
     pygame.init()
     pygame.joystick.init()
     clock = pygame.time.Clock()
+    font = pygame.font.SysFont(None, 50)
+    text_input_box = TextInputBox(10, 10, 50, font)
+    group = pygame.sprite.Group(text_input_box)
+    
+    text = font.render(f'SPEED: {speed}', True, (255, 255, 255), None)
+    textRect = text.get_rect()
+    
+
 
     while run:
         # -----------------------------------------------
@@ -76,7 +111,30 @@ def rungame(queue: Queue, event: Event) -> None:
                 resolution = (event.w, event.h)
                 screen = pygame.display.set_mode(
                     resolution, pygame.RESIZABLE)
-
+            # ! TESTING GUI
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE and not text_input_box.active:
+                    text_input_box.active = 1
+                if event.type == pygame.KEYDOWN and text_input_box.active:
+                    if event.key == pygame.K_RETURN:
+                        text_input_box.active = False
+                        print(f"final text {text_input_box.text}")
+                        try:
+                            speed = int(text_input_box.text)
+                            text = font.render(f'SPEED: {speed}', True, (255, 255, 255), None)
+                            if connected:
+                                server.send(['speed', speed])
+                        except:
+                            pass
+                        text_input_box.text = ''
+                    elif event.key == pygame.K_BACKSPACE:
+                        text_input_box.text = text_input_box.text[:-1]
+                    else:
+                        text_input_box.text += event.unicode
+                        # print(text_input_box.text)
+                    text_input_box.render_text()
+            # ! TESTING
+                
         # Check for any joystick inputs
         button1 = False
         button2 = False
@@ -96,18 +154,20 @@ def rungame(queue: Queue, event: Event) -> None:
         move = False
 
         # # Change motor speed to high or low.
+        # if keys[pygame.K_t] and connected:
+        #     speed = 0
+        #     try:
+        #         speed = int(input("set speed from 0 to 100: "))
+        #         if not type(speed) is int:
+        #             raise TypeError("Please only use integers for speed setting ")
+        #         elif (speed < 0) or (speed > 100):
+        #             raise ValueError("Speedrange is from 0 to 100: ")
+        #     except Exception as e:
+        #         print("Error occured ", e)
+        #     msg = ['speed', speed]
+        #     server.send(msg)
         if keys[pygame.K_t] and connected:
-            speed = 0
-            try:
-                speed = int(input("set speed from 0 to 100: "))
-                if not type(speed) is int:
-                    raise TypeError("Please only use integers for speed setting ")
-                elif (speed < 0) or (speed > 100):
-                    raise ValueError("Speedrange is from 0 to 100: ")
-            except Exception as e:
-                print("Error occured ", e)
-            msg = ['speed', speed]
-            server.send(msg)
+                text_input_box.active = 1
                 
             
         
@@ -231,7 +291,12 @@ def rungame(queue: Queue, event: Event) -> None:
 
         # Using a little red rectangle for movement visualisation
         pygame.draw.rect(screen, (255, 0, 0), (x, y, width, height))
+        if text_input_box.active:
+            group.draw(screen)
         # Update the screen and set framerate
+        
+        textRect.bottomright = (resolution[0]-10, resolution[1]-10)
+        screen.blit(text,textRect)
         pygame.display.update()
         clock.tick(15)
 
