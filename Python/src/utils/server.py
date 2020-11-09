@@ -169,10 +169,6 @@ class Server(object):
                 event.set()
                 
             self.close()
-                
-                # except Exception as e:
-                #     self.logger.info(f"[ERROR] Closing.. {e}")
-                #     self.logger.debug(f"[DEBUG] {e.with_traceback()}")
 
     def send(self, message: any) -> NoReturn:
         """
@@ -187,17 +183,12 @@ class Server(object):
             a disconnect message is received.
         """
         try:
-            # # self.socket.settimeout(5)'
-            # if message == "!DISCONNECT":
-            #     raise DisconnectMsg()
             senddata = pickle.dumps(message) # ! REWORK REMOVE PICKLE
             self.conn.send(senddata)
             logging.info(f"Sent {message} to client.")
         except DisconnectMsg as e:
             logging.info(e.__doc__)
             self.close()
-            # self.close()
         except Exception as e:
             logging.exception(
                 f"[ERROR] Failed to send message to client. \n {e}")
-            # self.close()

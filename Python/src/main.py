@@ -113,7 +113,6 @@ def rungame(queue: Queue, event: Event) -> None:
                 resolution = (event.w, event.h)
                 screen = pygame.display.set_mode(
                     resolution, pygame.RESIZABLE)
-            # ! TESTING GUI
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and not text_input_box.active:
                     text_input_box.active = 1
@@ -135,7 +134,6 @@ def rungame(queue: Queue, event: Event) -> None:
                         text_input_box.text += event.unicode
                         # print(text_input_box.text)
                     text_input_box.render_text()
-            # ! TESTING
                 
         # Check for any joystick inputs
         button1 = False
@@ -151,9 +149,6 @@ def rungame(queue: Queue, event: Event) -> None:
 
         # Fetch the current keys registered
         keys = pygame.key.get_pressed()
-
-        # Set move to false because we have not moved yet.
-        # move = False
 
         # Check both arrow and wasd keys for flags.
         # If no flags on them, check joystick.
@@ -220,6 +215,7 @@ def rungame(queue: Queue, event: Event) -> None:
                 stick_L[0] > deadzone):
             move = True
             stopped = False
+            x += vel
             tosend = 'd'
         # Flag for rotating counterclockwise
         elif keys[pygame.K_q] or button1:
@@ -288,9 +284,6 @@ if __name__ == '__main__':
     # Set up the threading environment with threadPoolExecutor.
     pipeline = queue.Queue(maxsize=5)
     event = threading.Event()
-    # with ThreadPoolExecutor(max_workers=2) as executor:
-    #     executor.submit(rungame, pipeline, event)
-    #     executor.submit(server.start, pipeline, event)
     
     thread1 = threading.Thread(target=rungame, args=(queue, event))
     thread2 = threading.Thread(target=server.start, args=(queue, event))
