@@ -49,6 +49,7 @@ def rungame(queue: Queue, event: Event) -> None:
     resolution: tuple = (640, 480)
     run: bool = True
     move: bool = False
+    speed: int = 0
     stopped: bool = False
     connected: bool = False
     drive_speed: str = 'LOW'
@@ -58,6 +59,7 @@ def rungame(queue: Queue, event: Event) -> None:
     pygame.init()
     pygame.joystick.init()
     clock = pygame.time.Clock()
+    arrow = pygame.image.load('red_arrow.png')
 
     while run:
         # -----------------------------------------------
@@ -78,14 +80,15 @@ def rungame(queue: Queue, event: Event) -> None:
                     resolution, pygame.RESIZABLE)
 
         # Check for any joystick inputs
-        button1 = False
-        button2 = False
-        try: 
+        try:
+            buttons = [] 
             joystick = pygame.joystick.Joystick(0)
             joystick.init()
             stick_L = (joystick.get_axis(0), joystick.get_axis(1))
-            button1 = joystick.get_button(4)
-            button2 = joystick.get_button(5)
+            buttons.insert(0,joystick.get_button(2))
+            buttons.insert(1,joystick.get_button(3))
+            buttons.insert(2,joystick.get_button(4))
+            buttons.insert(3,joystick.get_button(5))
         except:
             pass
 
@@ -115,6 +118,7 @@ def rungame(queue: Queue, event: Event) -> None:
         # Check both arrow and wasd keys for flags.
         # If no flags on them, check joystick.
         # If connected, send cmd to client.
+        
         # Flag for going northeast
         if ((keys[pygame.K_w] and keys[pygame.K_d]) or (
             keys[pygame.K_UP] and keys[pygame.K_RIGHT]) or
@@ -196,19 +200,35 @@ def rungame(queue: Queue, event: Event) -> None:
             if connected:
                 server.send('d')
         # Flag for rotating counterclockwise
-        elif keys[pygame.K_q] or button1:
+        elif keys[pygame.K_q] or buttons[2]:
             logging.debug('counterclockwise')
             move = True
             stopped = False
             if connected:
                 server.send('q')
         # Flag for rotating clockwise
-        elif keys[pygame.K_e] or button2:
+        elif keys[pygame.K_e] or buttons[3]:
             logging.debug('clockwise')
             move = True
             stopped = False
             if connected:
                 server.send('e')
+                
+        # Speedselection using controller
+        if buttons[0] and buttons[1]:
+            logging.debug('+1 -1 speed')
+        elif buttons[1]:
+            speed -= 1
+            if speed <= 0:
+                speed = 100
+        elif buttons[0]:
+            speed += 1
+            if speed >= 100:
+                speed = 100
+                        
+        if connected and (pygame.joystick.get_count > 0):
+            msg = ['speed', speed]
+            server.send(msg)
 
         # Check move and stop for flags
         # If none are true, no new inputs are detected and
