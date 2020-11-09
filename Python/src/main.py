@@ -18,7 +18,6 @@ import threading
 import pygame
 from threading import Event
 from queue import Queue
-from concurrent.futures import ThreadPoolExecutor
 from typing import NoReturn
 from pygame.constants import RESIZABLE
 
@@ -26,7 +25,7 @@ from pygame.constants import RESIZABLE
 from utils.server import Server
 
 
-def rungame(queue: Queue, events: Event) -> NoReturn:
+def rungame(queue: Queue, event: Event) -> NoReturn:
     """[summary]
     This method is the soul and main controller of the project.
     Within this method, you create a GUI 'game' where you 
@@ -37,7 +36,7 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
         queue ([type]): [description]
         events ([type]): [description]
     """
-    while not events.is_set():
+    while not event.is_set():
 
         x: int = 50
         y: int = 50
@@ -225,12 +224,12 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
         # Send warningflags to stop the server and client.
         # After this has been done, close the game properly.
         logging.debug("Closing server...")
-        server.send("!DISCONNECT")
+        # server.send("!DISCONNECT")
         # TODO: Perhaps add a wait here to ensure server sends disconnect?
         # server.close()
         logging.debug("Closing game...")
         pygame.quit()
-        break
+        event.set()
 
 
 # ---------- MAIN LOOP ----------
@@ -245,6 +244,16 @@ if __name__ == '__main__':
     # Set up the threading environment with threadPoolExecutor.
     pipeline = queue.Queue(maxsize=5)
     event = threading.Event()
-    with ThreadPoolExecutor(max_workers=2) as executor:
-        executor.submit(rungame, pipeline, event)
-        executor.submit(server.start, pipeline, event)
+    # with ThreadPoolExecutor(max_workers=2) as executor:
+    #     executor.submit(rungame, pipeline, event)
+    #     executor.submit(server.start, pipeline, event)
+    
+    thread1 = threading.Thread(target=rungame, args=(queue, event))
+    thread2 = threading.Thread(target=server.start, args=(queue, event))
+    
+    thread1.start()
+    thread2.start()
+    
+    thread1.join()
+    thread2.join()
+    

@@ -66,12 +66,14 @@ class Server(object):
         self.addr = ''
         self.frame = None
 
+    def isconnected(self) -> bool:
+        return self.connected
+    
     def close(self) -> NoReturn:
         """
         Shuts the server down.
         """
         self.server.close()
-        self.thread.join()
         self.connected = False
 
     def get_frame(self, resolution) -> any:
@@ -100,21 +102,20 @@ class Server(object):
             queue (Queue): [description]
             event (Event): [description]
         """
+        self.server.listen()
+        self.logger.info(f"Server is listening on {self.ADDR}")
         while not event.is_set():
+            data = b''
             try:
-                self.server.listen()
-                self.logger.info(f"Server is listening on {self.ADDR}")
                 self.conn, self.addr = self.server.accept()
                 logging.debug("connection accepted.")
                 self.connected = True
                 logging.debug("self.connected = True.")
                 logging.info(f"[NEW CONNECTION] {self.addr} connected.")
-                data = b''
-            except self.server.timeout:
-                self.close()
-            while True:
-                try:
-                    self.conn.settimeout(10)
+                
+                #! dont use pickle over network
+                while not event.is_set():
+                    self.conn.settimeout(2)
                     while len(data) < self.payload_size:
                         data += self.conn.recv(self.HEADER)
                     packed_msg_size = data[:self.payload_size]
@@ -136,14 +137,16 @@ class Server(object):
                     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
                     frame = pygame.surfarray.make_surface(frame)
                     self.frame = frame
-
-                except Exception as e:
-                    self.logger.info(f"[ERROR] Closing.. {e}")
-                    self.logger.debug(f"[DEBUG] {e.with_traceback()}")
-        return
-
-    def isconnected(self) -> bool:
-        return self.connected
+                    
+            except socket.timeout:
+                print("deadlmao")
+                event.set()
+                
+            self.close()
+                
+                # except Exception as e:
+                #     self.logger.info(f"[ERROR] Closing.. {e}")
+                #     self.logger.debug(f"[DEBUG] {e.with_traceback()}")
 
     def send(self, message: str) -> NoReturn:
         """
@@ -158,10 +161,10 @@ class Server(object):
             a disconnect message is received.
         """
         try:
-            # self.socket.settimeout(5)
-            if message == "!DISCONNECT":
-                raise DisconnectMsg()
-            senddata = pickle.dumps(message)
+            # # self.socket.settimeout(5)'
+            # if message == "!DISCONNECT":
+            #     raise DisconnectMsg()
+            senddata = pickle.dumps(message) # ! REWORK REMOVE PICKLE
             self.conn.send(senddata)
             logging.info(f"Sent {message} to client.")
         except DisconnectMsg as e:

@@ -19,7 +19,6 @@ import threading
 import queue
 import cv2
 from roboclaw_3 import Roboclaw
-from concurrent.futures import ThreadPoolExecutor
 from time import sleep
 from typing import NoReturn
 
@@ -86,6 +85,7 @@ class Client(object):
         self.thread.join()
         self.connected = False
         self.logger.info(f"Successfully disconnected from {self.ADDR}")
+        # self.isrunning = true
 
     def handle_send(self, queue: Queue, event: Event) -> NoReturn:
         """[summary]
@@ -127,90 +127,91 @@ class Client(object):
             event (Event): [description]
         """
         while not event.is_set():
-            while True:
-                data = self.socket.recv(self.HEADER)
-                msg = pickle.loads(data)
-                try:
-                    # ---------- Debugging ----------
-                    logging.info(f"Server sent data: {msg}")
-                    logging.debug(f"data: {data}")
-                    logging.debug(f"msg: {msg}")
-                    # -------------------------------
-                    if msg == 'w':
-                        logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.rc.ForwardM1(0x80, self.SPEED)
-                        self.rc.ForwardM1(0x81, self.SPEED)
-                        self.rc.ForwardM2(0x80, self.SPEED)
-                        self.rc.ForwardM2(0x81, self.SPEED)
-                        logging.debug(f"Sent command to MOCO. |{msg}| ")
-                    elif msg == 'a':
-                        logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.rc.BackwardM2(0x80, self.SPEED)
-                        self.rc.ForwardM1(0x80, self.SPEED)
-                        self.rc.ForwardM1(0x81, self.SPEED)
-                        self.rc.BackwardM2(0x81, self.SPEED)
-                        logging.debug(f"Sent command to MOCO. |{msg}| ")
-                    elif msg == 's':
-                        logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.rc.BackwardM1(0x80, self.SPEED)
-                        self.rc.BackwardM1(0x81, self.SPEED)
-                        self.rc.BackwardM2(0x80, self.SPEED)
-                        self.rc.BackwardM2(0x81, self.SPEED)
-                        logging.debug(f"Sent command to MOCO. |{msg}| ")
-                    elif msg == 'd':
-                        logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.rc.BackwardM1(0x80, self.SPEED)
-                        self.rc.ForwardM2(0x80, self.SPEED)
-                        self.rc.ForwardM2(0x81, self.SPEED)
-                        self.rc.BackwardM1(0x81, self.SPEED)
-                        logging.debug(f"Sent command to MOCO. |{msg}| ")
-                    elif msg == 'wd':
-                        logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.rc.ForwardM2(0x80, self.SPEED)
-                        self.rc.ForwardM2(0x81, self.SPEED)
-                    elif msg == 'wa':
-                        logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.rc.ForwardM1(0x80, self.SPEED)
-                        self.rc.ForwardM1(0x81, self.SPEED)
-                    elif msg == 'sd':
-                        logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.rc.BackwardM1(0x80, self.SPEED)
-                        self.rc.BackwardM1(0x81, self.SPEED)
-                    elif msg == 'sa':
-                        logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.rc.BackwardM2(0x80, self.SPEED)
-                        self.rc.BackwardM2(0x81, self.SPEED)
-                    elif msg == 'q':
-                        logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.rc.BackwardM2(0x80, self.SPEED)
-                        self.rc.ForwardM1(0x80, self.SPEED)
-                        self.rc.ForwardM2(0x81, self.SPEED)
-                        self.rc.BackwardM1(0x81, self.SPEED)
-                    elif msg == 'e':
-                        logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.rc.BackwardM1(0x80, self.SPEED)
-                        self.rc.ForwardM2(0x80, self.SPEED)
-                        self.rc.ForwardM1(0x81, self.SPEED)
-                        self.rc.BackwardM2(0x81, self.SPEED)
-                    elif msg == 'stop':
-                        logging.debug(f"Sending command to MOCO. |{msg}| ")
-                        self.rc.ForwardM1(0x80, 0)
-                        self.rc.ForwardM2(0x80, 0)
-                        self.rc.BackwardM1(0x80, 0)
-                        self.rc.BackwardM2(0x80, 0)
-                        self.rc.ForwardM1(0x81, 0)
-                        self.rc.ForwardM2(0x81, 0)
-                        self.rc.BackwardM1(0x81, 0)
-                        self.rc.BackwardM2(0x81, 0)
-                        logging.debug(f"Sent command to MOCO. |{msg}| ")
+            
+            data = self.socket.recv(self.HEADER)
+            msg = pickle.loads(data)
+            try:
+                # ---------- Debugging ----------
+                logging.info(f"Server sent data: {msg}")
+                logging.debug(f"data: {data}")
+                logging.debug(f"msg: {msg}")
+                # -------------------------------
+                if msg == 'w':
+                    logging.debug(f"Sending command to MOCO. |{msg}| ")
+                    self.rc.ForwardM1(0x80, self.SPEED)
+                    self.rc.ForwardM1(0x81, self.SPEED)
+                    self.rc.ForwardM2(0x80, self.SPEED)
+                    self.rc.ForwardM2(0x81, self.SPEED)
+                    logging.debug(f"Sent command to MOCO. |{msg}| ")
+                elif msg == 'a':
+                    logging.debug(f"Sending command to MOCO. |{msg}| ")
+                    self.rc.BackwardM2(0x80, self.SPEED)
+                    self.rc.ForwardM1(0x80, self.SPEED)
+                    self.rc.ForwardM1(0x81, self.SPEED)
+                    self.rc.BackwardM2(0x81, self.SPEED)
+                    logging.debug(f"Sent command to MOCO. |{msg}| ")
+                elif msg == 's':
+                    logging.debug(f"Sending command to MOCO. |{msg}| ")
+                    self.rc.BackwardM1(0x80, self.SPEED)
+                    self.rc.BackwardM1(0x81, self.SPEED)
+                    self.rc.BackwardM2(0x80, self.SPEED)
+                    self.rc.BackwardM2(0x81, self.SPEED)
+                    logging.debug(f"Sent command to MOCO. |{msg}| ")
+                elif msg == 'd':
+                    logging.debug(f"Sending command to MOCO. |{msg}| ")
+                    self.rc.BackwardM1(0x80, self.SPEED)
+                    self.rc.ForwardM2(0x80, self.SPEED)
+                    self.rc.ForwardM2(0x81, self.SPEED)
+                    self.rc.BackwardM1(0x81, self.SPEED)
+                    logging.debug(f"Sent command to MOCO. |{msg}| ")
+                elif msg == 'wd':
+                    logging.debug(f"Sending command to MOCO. |{msg}| ")
+                    self.rc.ForwardM2(0x80, self.SPEED)
+                    self.rc.ForwardM2(0x81, self.SPEED)
+                elif msg == 'wa':
+                    logging.debug(f"Sending command to MOCO. |{msg}| ")
+                    self.rc.ForwardM1(0x80, self.SPEED)
+                    self.rc.ForwardM1(0x81, self.SPEED)
+                elif msg == 'sd':
+                    logging.debug(f"Sending command to MOCO. |{msg}| ")
+                    self.rc.BackwardM1(0x80, self.SPEED)
+                    self.rc.BackwardM1(0x81, self.SPEED)
+                elif msg == 'sa':
+                    logging.debug(f"Sending command to MOCO. |{msg}| ")
+                    self.rc.BackwardM2(0x80, self.SPEED)
+                    self.rc.BackwardM2(0x81, self.SPEED)
+                elif msg == 'q':
+                    logging.debug(f"Sending command to MOCO. |{msg}| ")
+                    self.rc.BackwardM2(0x80, self.SPEED)
+                    self.rc.ForwardM1(0x80, self.SPEED)
+                    self.rc.ForwardM2(0x81, self.SPEED)
+                    self.rc.BackwardM1(0x81, self.SPEED)
+                elif msg == 'e':
+                    logging.debug(f"Sending command to MOCO. |{msg}| ")
+                    self.rc.BackwardM1(0x80, self.SPEED)
+                    self.rc.ForwardM2(0x80, self.SPEED)
+                    self.rc.ForwardM1(0x81, self.SPEED)
+                    self.rc.BackwardM2(0x81, self.SPEED)
+                elif msg == 'stop':
+                    logging.debug(f"Sending command to MOCO. |{msg}| ")
+                    self.rc.ForwardM1(0x80, 0)
+                    self.rc.ForwardM2(0x80, 0)
+                    self.rc.BackwardM1(0x80, 0)
+                    self.rc.BackwardM2(0x80, 0)
+                    self.rc.ForwardM1(0x81, 0)
+                    self.rc.ForwardM2(0x81, 0)
+                    self.rc.BackwardM1(0x81, 0)
+                    self.rc.BackwardM2(0x81, 0)
+                    logging.debug(f"Sent command to MOCO. |{msg}| ")
 
-                    # TODO: Test this method.
-                    # elif msg == '!DISCONNECT':
-                    #     logging.debug(f"Disconnecting..")
-                    #     self.disconnect()
-                except Exception as e:
-                    logging.debug(f"Exception occured: {e}")
-                    logging.debug(e.with_traceback())
+                # TODO: Test this method.
+                elif msg == '!DISCONNECT':
+                    logging.debug(f"Disconnecting..")
+                    # event.set()
+                    self.disconnect()
+            except Exception as e:
+                logging.debug(f"Exception occured: {e}")
+                logging.debug(e.with_traceback())
 
 
 # ---------- MAIN LOOP ----------
@@ -228,6 +229,14 @@ if __name__ == '__main__':
     # Set up the threading environment with threadPoolExecutor.
     pipeline = queue.Queue(maxsize=5)
     event = threading.Event()
-    with ThreadPoolExecutor(max_workers=2) as executor:
-        executor.submit(client.handle_read, pipeline, event)
-        executor.submit(client.handle_send, pipeline, event)
+    # with ThreadPoolExecutor(max_workers=2) as executor:
+    #     executor.submit(client.handle_read, pipeline, event)
+    #     executor.submit(client.handle_send, pipeline, event)
+    thread1 = threading.Thread(target=client.handle_read, args=(queue, event))
+    thread2 = threading.Thread(target=client.handle_send, args=(queue, event))
+    
+    thread1.start()
+    thread2.start()
+    
+    thread1.join()
+    thread2.join()
