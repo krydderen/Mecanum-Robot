@@ -44,6 +44,7 @@ def rungame(queue: Queue, event: Event) -> NoReturn:
         width: int = 40
         height: int = 60
         drive_time: int = 0.2
+        deadzone : float = 0.5
         stick_L: tuple = (0, 0)
         resolution: tuple = (640, 480)
         run: bool = True
@@ -91,17 +92,18 @@ def rungame(queue: Queue, event: Event) -> NoReturn:
             move = False
 
             # # Change motor speed to high or low.
-            if keys[pygame.K_t]:
-                speed : int = 0
+            if keys[pygame.K_t] and connected:
+                speed = 0
                 try:
-                    speed = (input("set speed from 0 to 100: "))
+                    speed = int(input("set speed from 0 to 100: "))
                     if not type(speed) is int:
                         raise TypeError("Please only use integers for speed setting ")
                     elif (speed < 0) or (speed > 100):
                         raise ValueError("Speedrange is from 0 to 100: ")
                 except Exception as e:
                     print("Error occured ", e)
-                server.send('speed', speed)
+                msg = ['speed', speed]
+                server.send(msg)
                     
                 
             
@@ -112,7 +114,7 @@ def rungame(queue: Queue, event: Event) -> NoReturn:
             # Flag for going northeast
             if ((keys[pygame.K_w] and keys[pygame.K_d]) or (
                 keys[pygame.K_UP] and keys[pygame.K_RIGHT]) or
-                    stick_L[0] > 0.3 and stick_L[1] < -0.3):
+                    stick_L[0] > deadzone and stick_L[1] < -deadzone):
                 logging.debug('wd')
                 move = True
                 stopped = False
@@ -123,7 +125,7 @@ def rungame(queue: Queue, event: Event) -> NoReturn:
             # Flag for going northwest
             elif ((keys[pygame.K_w] and keys[pygame.K_a]) or (
                     keys[pygame.K_UP] and keys[pygame.K_LEFT]) or
-                    stick_L[0] < -0.3 and stick_L[1] < -0.3):
+                    stick_L[0] < -deadzone and stick_L[1] < -deadzone):
                 logging.debug('wa')
                 move = True
                 stopped = False
@@ -134,17 +136,18 @@ def rungame(queue: Queue, event: Event) -> NoReturn:
             # Flag for going southeast
             elif ((keys[pygame.K_s] and keys[pygame.K_d]) or (
                     keys[pygame.K_DOWN] and keys[pygame.K_RIGHT]) or
-                    stick_L[0] > 0.3 and stick_L[1] > 0.3):
+                    stick_L[0] > deadzone and stick_L[1] > deadzone):
                 logging.debug('sd')
                 move = True
                 stopped = False
+                y += vel
                 x += vel
                 if connected:
                     server.send('sd')
             # Flag for going southwest
             elif ((keys[pygame.K_s] and keys[pygame.K_a]) or (
                     keys[pygame.K_DOWN] and keys[pygame.K_LEFT]) or
-                    stick_L[0] < -0.3 and stick_L[1] > 0.3):
+                    stick_L[0] < -deadzone and stick_L[1] > deadzone):
                 logging.debug('sa')
                 move = True
                 stopped = False
@@ -154,7 +157,7 @@ def rungame(queue: Queue, event: Event) -> NoReturn:
                     server.send('sa')
             # Flag for going forward/north
             elif (keys[pygame.K_w] or keys[pygame.K_UP] or
-                  stick_L[1] < -0.3):
+                  stick_L[1] < -deadzone):
                 logging.debug('up')
                 move = True
                 stopped = False
@@ -163,7 +166,7 @@ def rungame(queue: Queue, event: Event) -> NoReturn:
                     server.send('w')
             # Flag for going south/down
             elif (keys[pygame.K_s] or keys[pygame.K_DOWN] or
-                  stick_L[1] > 0.3):
+                  stick_L[1] > deadzone):
                 logging.debug('down')
                 move = True
                 stopped = False
@@ -172,7 +175,7 @@ def rungame(queue: Queue, event: Event) -> NoReturn:
                     server.send('s')
             # Flag for going left/west
             elif (keys[pygame.K_a] or keys[pygame.K_LEFT] or
-                  stick_L[0] < - 0.3):
+                  stick_L[0] < - deadzone):
                 logging.debug('left')
                 move = True
                 stopped = False
@@ -181,7 +184,7 @@ def rungame(queue: Queue, event: Event) -> NoReturn:
                     server.send('a')
             # Flag for going right/east
             elif (keys[pygame.K_d] or keys[pygame.K_RIGHT] or
-                  stick_L[0] > 0.3):
+                  stick_L[0] > deadzone):
                 logging.debug('right')
                 move = True
                 stopped = False
@@ -216,8 +219,8 @@ def rungame(queue: Queue, event: Event) -> NoReturn:
 
             # If connected, fill the background with the videostream
             # If not, just fill it with black
-            if connected:
-                frame = server.get_frame(resolution)
+            frame = server.get_frame(resolution)
+            if connected and frame != None:
                 screen.blit(frame, (0, 0))
             else:
                 screen.fill('black')

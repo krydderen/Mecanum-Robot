@@ -87,8 +87,11 @@ class Server(object):
         Returns:
             any: The formatted frame.
         """
-        frame = pygame.transform.scale(self.frame, resolution)
-        return frame
+        if self.frame != None:
+            frame = pygame.transform.scale(self.frame, resolution)
+            return frame
+        else:
+            return
 
     def start(self, queue: Queue, event: Event) -> None:
         """
@@ -128,7 +131,6 @@ class Server(object):
                         data += self.conn.recv(self.HEADER)
                     frame_data = data[:msg_size]
                     data = data[msg_size:]
-
                     frame = pickle.loads(frame_data)
                     frame = cv2.flip(frame, 0)
                     frame = cv2.flip(frame, 1)
@@ -148,7 +150,7 @@ class Server(object):
                 #     self.logger.info(f"[ERROR] Closing.. {e}")
                 #     self.logger.debug(f"[DEBUG] {e.with_traceback()}")
 
-    def send(self, message: str) -> NoReturn:
+    def send(self, message: any) -> NoReturn:
         """
         Formats and sends the given CMD to the client. 
 
