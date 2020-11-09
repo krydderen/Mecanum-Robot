@@ -92,13 +92,19 @@ def rungame(queue: Queue, events: Event) -> NoReturn:
             move = False
 
             # # Change motor speed to high or low.
-            # if keys[pygame.K_t]:
-            #     if drive_speed == 'LOW':
-            #         drive_speed = 'HIGH'
-            #         logging.debug('Drive speed is now HIGH')
-            #     elif drive_speed == 'HIGH':
-            #         drive_speed = 'LOW'
-            #         logging.debug('Drive speed is now LOW')
+            if keys[pygame.K_t]:
+                try:
+                    speed = (input("set speed from 0 to 100: "))
+                    if not type(speed) is int:
+                        raise TypeError("Please only use integers for speed setting ")
+                    elif (speed < 0) or (speed > 100):
+                        raise ValueError("Speedrange is from 0 to 100: ")
+                except Exception as e:
+                    print("Error occured ", e)
+                server.send('speed', speed)
+                    
+                
+            
 
             # Check both arrow and wasd keys for flags.
             # If no flags on them, check joystick.
