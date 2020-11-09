@@ -66,7 +66,12 @@ class Server(object):
         self.addr = ''
         self.frame = None
         self.canny = None
+        self.stop = False
 
+    def stop(self):
+        self.stop = True
+        return
+    
     def isconnected(self) -> bool:
         return self.connected
     
@@ -123,7 +128,7 @@ class Server(object):
         """
         self.server.listen()
         self.logger.info(f"Server is listening on {self.ADDR}")
-        while not event.is_set():
+        while not event.is_set() and not self.stop:
             data = b''
             try:
                 self.conn, self.addr = self.server.accept()
@@ -133,7 +138,7 @@ class Server(object):
                 logging.info(f"[NEW CONNECTION] {self.addr} connected.")
                 
                 #! dont use pickle over network
-                while not event.is_set():
+                while not event.is_set() and not self.stop:
                     self.conn.settimeout(2)
                     while len(data) < self.payload_size:
                         data += self.conn.recv(self.HEADER)
