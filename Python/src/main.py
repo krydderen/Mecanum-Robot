@@ -77,6 +77,8 @@ def rungame(queue: Queue, event: Event) -> None:
     move: bool = False
     stopped: bool = False
     connected: bool = False
+    tosend: str = ''
+    lastsent:str = ''
     
 
 
@@ -151,26 +153,7 @@ def rungame(queue: Queue, event: Event) -> None:
         keys = pygame.key.get_pressed()
 
         # Set move to false because we have not moved yet.
-        move = False
-
-        # # Change motor speed to high or low.
-        # if keys[pygame.K_t] and connected:
-        #     speed = 0
-        #     try:
-        #         speed = int(input("set speed from 0 to 100: "))
-        #         if not type(speed) is int:
-        #             raise TypeError("Please only use integers for speed setting ")
-        #         elif (speed < 0) or (speed > 100):
-        #             raise ValueError("Speedrange is from 0 to 100: ")
-        #     except Exception as e:
-        #         print("Error occured ", e)
-        #     msg = ['speed', speed]
-        #     server.send(msg)
-        if keys[pygame.K_t] and connected:
-                text_input_box.active = 1
-                
-            
-        
+        # move = False
 
         # Check both arrow and wasd keys for flags.
         # If no flags on them, check joystick.
@@ -179,107 +162,91 @@ def rungame(queue: Queue, event: Event) -> None:
         if ((keys[pygame.K_w] and keys[pygame.K_d]) or (
             keys[pygame.K_UP] and keys[pygame.K_RIGHT]) or
                 stick_L[0] > deadzone and stick_L[1] < -deadzone):
-            logging.debug('wd')
             move = True
             stopped = False
             y -= vel
             x += vel
-            if connected:
-                server.send('wd')
+            tosend = 'wd'
         # Flag for going northwest
         elif ((keys[pygame.K_w] and keys[pygame.K_a]) or (
                 keys[pygame.K_UP] and keys[pygame.K_LEFT]) or
                 stick_L[0] < -deadzone and stick_L[1] < -deadzone):
-            logging.debug('wa')
             move = True
             stopped = False
             y -= vel
             x -= vel
-            if connected:
-                server.send('wa')
+            tosend = 'wa'
         # Flag for going southeast
         elif ((keys[pygame.K_s] and keys[pygame.K_d]) or (
                 keys[pygame.K_DOWN] and keys[pygame.K_RIGHT]) or
                 stick_L[0] > deadzone and stick_L[1] > deadzone):
-            logging.debug('sd')
             move = True
             stopped = False
             y += vel
             x += vel
-            if connected:
-                server.send('sd')
+            tosend = 'sd'
         # Flag for going southwest
         elif ((keys[pygame.K_s] and keys[pygame.K_a]) or (
                 keys[pygame.K_DOWN] and keys[pygame.K_LEFT]) or
                 stick_L[0] < -deadzone and stick_L[1] > deadzone):
-            logging.debug('sa')
             move = True
             stopped = False
             y += vel
             x -= vel
-            if connected:
-                server.send('sa')
+            tosend = 'sa'
         # Flag for going forward/north
         elif (keys[pygame.K_w] or keys[pygame.K_UP] or
                 stick_L[1] < -deadzone):
-            logging.debug('up')
             move = True
             stopped = False
             y -= vel
-            if connected:
-                server.send('w')
+            tosend = 'w'
         # Flag for going south/down
         elif (keys[pygame.K_s] or keys[pygame.K_DOWN] or
                 stick_L[1] > deadzone):
-            logging.debug('down')
             move = True
             stopped = False
             y += vel
-            if connected:
-                server.send('s')
+            tosend = 's'
         # Flag for going left/west
         elif (keys[pygame.K_a] or keys[pygame.K_LEFT] or
                 stick_L[0] < - deadzone):
-            logging.debug('left')
             move = True
             stopped = False
             x -= vel
-            if connected:
-                server.send('a')
+            tosend = 'a'
         # Flag for going right/east
         elif (keys[pygame.K_d] or keys[pygame.K_RIGHT] or
                 stick_L[0] > deadzone):
-            logging.debug('right')
             move = True
             stopped = False
-            x += vel
-            if connected:
-                server.send('d')
+            tosend = 'd'
         # Flag for rotating counterclockwise
         elif keys[pygame.K_q] or button1:
-            logging.debug('counterclockwise')
             move = True
             stopped = False
-            if connected:
-                server.send('q')
+            tosend = 'q'
         # Flag for rotating clockwise
         elif keys[pygame.K_e] or button2:
-            logging.debug('clockwise')
             move = True
             stopped = False
-            if connected:
-                server.send('e')
+            tosend = 'e'
+        else:
+            move = False
 
         # Check move and stop for flags
         # If none are true, no new inputs are detected and
         # thus we stop the robot
-        if move == False and stopped == False:
-            logging.debug('stop')
+        if move == False and stopped == False and connected:
             if connected:
                 server.send('stop')
             stopped = True
-        else:
-            pass
+            lastsent = 'stop'
+            logging.debug(lastsent)
+        elif move == True and connected and lastsent != tosend:
+            server.send(tosend)
+            lastsent = tosend
+            logging.debug(lastsent)
 
         # If connected, fill the background with the videostream
         # If not, just fill it with black
