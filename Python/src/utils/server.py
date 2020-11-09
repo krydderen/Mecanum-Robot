@@ -65,6 +65,7 @@ class Server(object):
         self.conn = ''
         self.addr = ''
         self.frame = None
+        self.canny = None
 
     def isconnected(self) -> bool:
         return self.connected
@@ -75,7 +76,22 @@ class Server(object):
         """
         self.server.close()
         self.connected = False
+        
+    def get_canny(self) -> any:
+            """
+            Transforms the frame to suit the format
+            of the GUI.
+            Args:
+                resolution (tuple): The set resolution we want
+                the frame to be.
 
+            Returns:
+                any: The formatted frame.
+            """
+            if self.canny != None:
+                return self.canny
+            else:
+                return
     def get_frame(self, resolution) -> any:
         """
         Transforms the frame to suit the format
@@ -137,7 +153,10 @@ class Server(object):
                     frame = numpy.rot90(frame)
                     frame = frame[::-1]
                     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+                    blur  = cv2.GaussianBlur(frame, (5,5),1)
+                    canny = cv2.Canny(blur,50,150)
                     frame = pygame.surfarray.make_surface(frame)
+                    self.canny = canny
                     self.frame = frame
                     
             except socket.timeout:

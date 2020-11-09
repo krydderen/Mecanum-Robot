@@ -101,17 +101,17 @@ class Client(object):
         Returns:
             NoReturn: [description]
         """
-        while not event.is_set():
-            while self.connected:
-                try:
-                    cv2.waitKey(100)
-                    _, self.frame = self.cap.read()
-                    frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
-                    data = pickle.dumps(frame)
-                    self.socket.sendall(struct.pack("L", len(data)) + data)
-                except Exception as e:
-                    self.logger.exception(f"[ERROR] Closing.. {e}")
-                    break
+        while not event.is_set() and self.connected:
+            try:
+                cv2.waitKey(100)
+                _, self.frame = self.cap.read()
+                frame = cv2.cvtColor(self.frame, cv2.COLOR_BGR2GRAY)
+                data = pickle.dumps(frame)
+                self.socket.sendall(struct.pack("L", len(data)) + data)
+            except Exception as e:
+                self.logger.exception(f"[ERROR] Closing.. {e}")
+                event.set()
+                break
 
     def handle_read(self, queue: Queue, event: Event) -> NoReturn:
         """
