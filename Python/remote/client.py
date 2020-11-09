@@ -232,9 +232,7 @@ if __name__ == '__main__':
     # Set up the threading environment with threadPoolExecutor.
     pipeline = queue.Queue(maxsize=5)
     event = threading.Event()
-    # with ThreadPoolExecutor(max_workers=2) as executor:
-    #     executor.submit(client.handle_read, pipeline, event)
-    #     executor.submit(client.handle_send, pipeline, event)
+    
     thread1 = threading.Thread(target=client.handle_read, args=(queue, event))
     thread2 = threading.Thread(target=client.handle_send, args=(queue, event))
     

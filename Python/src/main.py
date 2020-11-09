@@ -20,10 +20,35 @@ from threading import Event
 from queue import Queue
 from typing import NoReturn
 from pygame.constants import RESIZABLE
+import pygame_gui
 
 # Importing utils
 from utils.server import Server
 
+class TextInputBox(pygame.sprite.Sprite):
+    def __init__(self, x, y, w, font):
+        super().__init__()
+        self.color = (255, 255, 255)
+        self.backcolor = None
+        self.pos = (x, y) 
+        self.width = w
+        self.font = font
+        self.active = False
+        self.text = ""
+        self.render_text()
+
+    def render_text(self):
+        t_surf = self.font.render(self.text, True, self.color, self.backcolor)
+        self.image = pygame.Surface((max(self.width, t_surf.get_width()+20), t_surf.get_height()+10), pygame.SRCALPHA)
+        if self.backcolor:
+            self.image.fill(self.backcolor)
+        if self.active:
+            self.image.blit(t_surf, (5, 5))
+            pygame.draw.rect(self.image, self.color, self.image.get_rect(),2)
+            self.rect = self.image.get_rect(topleft = self.pos)
+        else:
+            pass
+        
 
 def rungame(queue: Queue, event: Event) -> None:
     """[summary]
@@ -43,6 +68,7 @@ def rungame(queue: Queue, event: Event) -> None:
     vel: int = 5*2
     width: int = 40
     height: int = 60
+    speed: int = 100
     drive_time: int = 0.2
     deadzone : float = 0.5
     stick_L: tuple = (0, 0)
@@ -52,14 +78,25 @@ def rungame(queue: Queue, event: Event) -> None:
     speed: int = 0
     stopped: bool = False
     connected: bool = False
-    drive_speed: str = 'LOW'
+    tosend: str = ''
+    lastsent:str = ''
+    
+
 
     screen = pygame.display.set_mode(resolution, pygame.RESIZABLE)
     pygame.display.set_caption("brom brom")
     pygame.init()
     pygame.joystick.init()
     clock = pygame.time.Clock()
+    font = pygame.font.SysFont(None, 50)
+    text_input_box = TextInputBox(10, 10, 50, font)
+    group = pygame.sprite.Group(text_input_box)
+    
+    text = font.render(f'SPEED: {speed}', True, (255, 255, 255), None)
+    textRect = text.get_rect()
+    
     arrow = pygame.image.load('red_arrow.png')
+
 
     while run:
         # -----------------------------------------------
@@ -78,7 +115,28 @@ def rungame(queue: Queue, event: Event) -> None:
                 resolution = (event.w, event.h)
                 screen = pygame.display.set_mode(
                     resolution, pygame.RESIZABLE)
-
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE and not text_input_box.active:
+                    text_input_box.active = 1
+                if event.type == pygame.KEYDOWN and text_input_box.active:
+                    if event.key == pygame.K_RETURN:
+                        text_input_box.active = False
+                        print(f"final text {text_input_box.text}")
+                        try:
+                            speed = int(text_input_box.text)
+                            text = font.render(f'SPEED: {speed}', True, (255, 255, 255), None)
+                            if connected:
+                                server.send(['speed', speed])
+                        except:
+                            pass
+                        text_input_box.text = ''
+                    elif event.key == pygame.K_BACKSPACE:
+                        text_input_box.text = text_input_box.text[:-1]
+                    else:
+                        text_input_box.text += event.unicode
+                        # print(text_input_box.text)
+                    text_input_box.render_text()
+                
         # Check for any joystick inputs
         try:
             buttons = [] 
@@ -95,26 +153,6 @@ def rungame(queue: Queue, event: Event) -> None:
         # Fetch the current keys registered
         keys = pygame.key.get_pressed()
 
-        # Set move to false because we have not moved yet.
-        move = False
-
-        # # Change motor speed to high or low.
-        if keys[pygame.K_t] and connected:
-            speed = 0
-            try:
-                speed = int(input("set speed from 0 to 100: "))
-                if not type(speed) is int:
-                    raise TypeError("Please only use integers for speed setting ")
-                elif (speed < 0) or (speed > 100):
-                    raise ValueError("Speedrange is from 0 to 100: ")
-            except Exception as e:
-                print("Error occured ", e)
-            msg = ['speed', speed]
-            server.send(msg)
-                
-            
-        
-
         # Check both arrow and wasd keys for flags.
         # If no flags on them, check joystick.
         # If connected, send cmd to client.
@@ -123,96 +161,78 @@ def rungame(queue: Queue, event: Event) -> None:
         if ((keys[pygame.K_w] and keys[pygame.K_d]) or (
             keys[pygame.K_UP] and keys[pygame.K_RIGHT]) or
                 stick_L[0] > deadzone and stick_L[1] < -deadzone):
-            logging.debug('wd')
             move = True
             stopped = False
             y -= vel
             x += vel
-            if connected:
-                server.send('wd')
+            tosend = 'wd'
         # Flag for going northwest
         elif ((keys[pygame.K_w] and keys[pygame.K_a]) or (
                 keys[pygame.K_UP] and keys[pygame.K_LEFT]) or
                 stick_L[0] < -deadzone and stick_L[1] < -deadzone):
-            logging.debug('wa')
             move = True
             stopped = False
             y -= vel
             x -= vel
-            if connected:
-                server.send('wa')
+            tosend = 'wa'
         # Flag for going southeast
         elif ((keys[pygame.K_s] and keys[pygame.K_d]) or (
                 keys[pygame.K_DOWN] and keys[pygame.K_RIGHT]) or
                 stick_L[0] > deadzone and stick_L[1] > deadzone):
-            logging.debug('sd')
             move = True
             stopped = False
             y += vel
             x += vel
-            if connected:
-                server.send('sd')
+            tosend = 'sd'
         # Flag for going southwest
         elif ((keys[pygame.K_s] and keys[pygame.K_a]) or (
                 keys[pygame.K_DOWN] and keys[pygame.K_LEFT]) or
                 stick_L[0] < -deadzone and stick_L[1] > deadzone):
-            logging.debug('sa')
             move = True
             stopped = False
             y += vel
             x -= vel
-            if connected:
-                server.send('sa')
+            tosend = 'sa'
         # Flag for going forward/north
         elif (keys[pygame.K_w] or keys[pygame.K_UP] or
                 stick_L[1] < -deadzone):
-            logging.debug('up')
             move = True
             stopped = False
             y -= vel
-            if connected:
-                server.send('w')
+            tosend = 'w'
         # Flag for going south/down
         elif (keys[pygame.K_s] or keys[pygame.K_DOWN] or
                 stick_L[1] > deadzone):
-            logging.debug('down')
             move = True
             stopped = False
             y += vel
-            if connected:
-                server.send('s')
+            tosend = 's'
         # Flag for going left/west
         elif (keys[pygame.K_a] or keys[pygame.K_LEFT] or
                 stick_L[0] < - deadzone):
-            logging.debug('left')
             move = True
             stopped = False
             x -= vel
-            if connected:
-                server.send('a')
+            tosend = 'a'
         # Flag for going right/east
         elif (keys[pygame.K_d] or keys[pygame.K_RIGHT] or
                 stick_L[0] > deadzone):
-            logging.debug('right')
             move = True
             stopped = False
             x += vel
-            if connected:
-                server.send('d')
+            tosend = 'd'
         # Flag for rotating counterclockwise
-        elif keys[pygame.K_q] or buttons[2]:
-            logging.debug('counterclockwise')
+        elif keys[pygame.K_q] or button1:
             move = True
             stopped = False
-            if connected:
-                server.send('q')
+            tosend = 'q'
         # Flag for rotating clockwise
-        elif keys[pygame.K_e] or buttons[3]:
-            logging.debug('clockwise')
+        elif keys[pygame.K_e] or button2:
             move = True
             stopped = False
-            if connected:
-                server.send('e')
+            tosend = 'e'
+        else:
+            move = False
                 
         # Speedselection using controller
         if buttons[0] and buttons[1]:
@@ -233,13 +253,16 @@ def rungame(queue: Queue, event: Event) -> None:
         # Check move and stop for flags
         # If none are true, no new inputs are detected and
         # thus we stop the robot
-        if move == False and stopped == False:
-            logging.debug('stop')
+        if move == False and stopped == False and connected:
             if connected:
                 server.send('stop')
             stopped = True
-        else:
-            pass
+            lastsent = 'stop'
+            logging.debug(lastsent)
+        elif move == True and connected and lastsent != tosend:
+            server.send(tosend)
+            lastsent = tosend
+            logging.debug(lastsent)
 
         # If connected, fill the background with the videostream
         # If not, just fill it with black
@@ -251,7 +274,12 @@ def rungame(queue: Queue, event: Event) -> None:
 
         # Using a little red rectangle for movement visualisation
         pygame.draw.rect(screen, (255, 0, 0), (x, y, width, height))
+        if text_input_box.active:
+            group.draw(screen)
         # Update the screen and set framerate
+        
+        textRect.bottomright = (resolution[0]-10, resolution[1]-10)
+        screen.blit(text,textRect)
         pygame.display.update()
         clock.tick(15)
 
@@ -276,9 +304,6 @@ if __name__ == '__main__':
     # Set up the threading environment with threadPoolExecutor.
     pipeline = queue.Queue(maxsize=5)
     event = threading.Event()
-    # with ThreadPoolExecutor(max_workers=2) as executor:
-    #     executor.submit(rungame, pipeline, event)
-    #     executor.submit(server.start, pipeline, event)
     
     thread1 = threading.Thread(target=rungame, args=(queue, event))
     thread2 = threading.Thread(target=server.start, args=(queue, event))
