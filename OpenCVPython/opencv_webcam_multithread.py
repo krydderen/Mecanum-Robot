@@ -49,12 +49,12 @@ if __name__ == "__main__":
 
     vs = WebCamVideoStream().start()
     while True:
-        frame = vs.read()
+        _, frame = vs.read()
 
         """
         Start of facial detection
         """
-        # TODO Try with faciel detection in its own thread? Even faster?
+        # TODO Try with facial detection in its own thread? Even faster?
 
         frameGray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         faces = face_Cascade.detectMultiScale(frameGray, 1.1, 4)

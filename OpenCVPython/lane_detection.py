@@ -2,6 +2,9 @@ import cv2
 import numpy as np
 import matplotlib.pyplot as plt
 
+# TODO Something here doesn't work. There might be an error with conversion at some point.
+# TODO Come back to this if you have time or can't find another solution
+
 """ The cannny function calculates derivative in x and y directions, and according to that,
     we can see the changes in intensity value. Larger derivatives equal to High intensity(sharp changes),
     Smaller derivatives equal to Low intensity(shallow changes)
@@ -24,11 +27,13 @@ def canny_edge_detector(image):
 
 def region_of_interest(image):
     height = image.shape[0]
-    polygons = np.array([(200, height), (1100, height), (550, 250)])
+    polygons = np.array([
+                        [(200, height), (1100, height), (550, 250)]
+                        ])
     mask = np.zeros_like(image)
 
     # Fill poly_function deals with multiple polygon
-    cv2.fillpoly(mask, polygons, 255)
+    image = cv2.fillPoly(mask, polygons, 255)
 
     # Bitwise operation between canny image and mask image
     masked_image = cv2.bitwise_and(image, mask)
@@ -95,8 +100,8 @@ def display_lines(image, lines):
 """
 
 # Path of tdataset directory
-cap = cv2.VideoCapture("dataset\test.mp4")
-while(cap.isOpened()):
+cap = cv2.VideoCapture('OpenCVPython/test2.mp4')
+while True:
     _, frame = cap.read()
     canny_image = canny_edge_detector(frame)
     cropped_image = region_of_interest(canny_image)
