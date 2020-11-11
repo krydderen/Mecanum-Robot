@@ -5,6 +5,8 @@ import numpy as np
 from tqdm import tqdm_notebook
 import matplotlib.pyplot as plt
 
+# TODO Make the code react to something entering the region of interst
+
 
 def CannyEdge(image):
     gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
@@ -37,6 +39,8 @@ while True:
 
     cv2.imshow("Feed", frame)
     cv2.imshow("ROI", cropped_image)
+    if cropped_image.any() > 0:
+        print("lmao")
 
     if cv2.waitKey(1) == ord("q"):
         cv2.destroyAllWindows
