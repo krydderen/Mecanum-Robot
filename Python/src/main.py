@@ -20,7 +20,6 @@ from threading import Event
 from queue import Queue
 from typing import NoReturn
 from pygame.constants import RESIZABLE
-import pygame_gui
 import os
 
 # Importing utils
@@ -92,10 +91,14 @@ def rungame(queue: Queue, event: Event) -> None:
     font = pygame.font.SysFont(None, 50)
     text_input_box = TextInputBox(10, 10, 50, font)
     group = pygame.sprite.Group(text_input_box)
+    direction_pos = (0, resolution[1]-50)
     arrow = pygame.transform.smoothscale(pygame.image.load('red_arrow.png'), (50,50))
+    arrowrect = arrow.get_rect()
+    arrowrect.x, arrowrect.y = direction_pos
     box = pygame.transform.smoothscale(pygame.image.load('red_square.png'), (50,50))
+    boxrect = box.get_rect()
     directionfigure = box
-    x_pos, y_pos = (0, resolution[1]-50)
+    
     text = font.render(f'SPEED: {speed}', True, (255, 255, 255), None)
     textRect = text.get_rect()
     
@@ -318,17 +321,17 @@ def rungame(queue: Queue, event: Event) -> None:
             screen.fill('black')
 
         # Using a little red rectangle for movement visualisation
-        pygame.draw.rect(screen, (255, 0, 0), (x, y, width, height))
+        #pygame.draw.rect(screen, (255, 0, 0), (x, y, width, height))
         if text_input_box.active:
             group.draw(screen)
 
-        screen.blit(directionfigure, (x_pos,y_pos))
+        screen.blit(directionfigure, direction_pos)
         # Update the screen and set framerate
         
         textRect.bottomright = (resolution[0]-10, resolution[1]-10)
         screen.blit(text,textRect)
         pygame.display.update()
-        
+
         
         clock.tick(15)
         
