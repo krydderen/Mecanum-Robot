@@ -92,7 +92,10 @@ def rungame(queue: Queue, event: Event) -> None:
     font = pygame.font.SysFont(None, 50)
     text_input_box = TextInputBox(10, 10, 50, font)
     group = pygame.sprite.Group(text_input_box)
-    
+    arrow = pygame.transform.smoothscale(pygame.image.load('red_arrow.png'), (50,50))
+    box = pygame.transform.smoothscale(pygame.image.load('red_square.png'), (50,50))
+    directionfigure = box
+    x_pos, y_pos = (0, resolution[1]-50)
     text = font.render(f'SPEED: {speed}', True, (255, 255, 255), None)
     textRect = text.get_rect()
     
@@ -102,14 +105,11 @@ def rungame(queue: Queue, event: Event) -> None:
     else:
         print("Can't change the Current Working Directory")
 
-    arrow = pygame.transform.smoothscale(pygame.image.load('red_arrow.png'),
-    (50,50))
-
     while run:
         # -----------------------------------------------
         # ---------Check if connection is active---------
         connected = server.isconnected()
-
+        
         # pygame.time.delay(50)
 
         # Get the current events happening on screen
@@ -130,10 +130,11 @@ def rungame(queue: Queue, event: Event) -> None:
                         text_input_box.active = False
                         print(f"final text {text_input_box.text}")
                         try:
-                            speed = int(text_input_box.text)
+                            newspeed = int(text_input_box.text)
                             text = font.render(f'SPEED: {speed}', True, (255, 255, 255), None)
-                            if connected:
-                                server.send(['speed', speed])
+                            if connected and currentspeed != newspeed:
+                                server.send(['speed', newspeed])
+                                currentspeed = newspeed
                         except:
                             pass
                         text_input_box.text = ''
@@ -219,7 +220,6 @@ def rungame(queue: Queue, event: Event) -> None:
                 stick_L[0] < - deadzone):
             move = True
             stopped = False
-            arrow = (pygame.transform.rotate(arrow, 180), (0,resolution[1]-50))
             x -= vel
             tosend = 'a'
         # Flag for going right/east
@@ -227,7 +227,6 @@ def rungame(queue: Queue, event: Event) -> None:
                 stick_L[0] > deadzone):
             move = True
             stopped = False
-            arrow = (pygame.transform.rotate(arrow, 0), (0,resolution[1]-50))
             x += vel
             tosend = 'd'
         # Flag for rotating counterclockwise
@@ -247,32 +246,68 @@ def rungame(queue: Queue, event: Event) -> None:
         if buttons[0] and buttons[1]:
             logging.debug('+1 -1 speed')
         elif buttons[1]:
-            speed -= 1
-            if speed <= 0:
-                speed = 100
+            newspeed -= 1
+            if newspeed <= 0:
+                newspeed = 100
         elif buttons[0]:
-            speed += 1
-            if speed >= 100:
-                speed = 100
+            newspeed += 1
+            if newspeed >= 100:
+                newspeed = 100
                         
-        if connected and (pygame.joystick.get_count > 0):
-            msg = ['speed', speed]
+        if connected and (pygame.joystick.get_count > 0) and currentspeed != newspeed:
+            msg = ['speed', newspeed]
             server.send(msg)
-
+            currentspeed = newspeed
+            
+        if tosend == 'w' and lastsent != tosend:
+            directionfigure = (pygame.transform.rotate(arrow, 90))
+        elif tosend == 'a' and lastsent != tosend:
+            directionfigure = (pygame.transform.rotate(arrow, 180))
+        elif tosend == 's' and lastsent != tosend:
+            directionfigure = (pygame.transform.rotate(arrow, 270))
+        elif tosend == 'd' and lastsent != tosend:
+            directionfigure = (pygame.transform.rotate(arrow, 0))
+        elif tosend == 'wd' and lastsent != tosend:
+            directionfigure = (pygame.transform.rotate(arrow, 45))
+            x_pos, y_pos = (-10, resolution[1]-60)
+        elif tosend == 'wa' and lastsent != tosend:
+            directionfigure = (pygame.transform.rotate(arrow, 125))
+            x_pos, y_pos = (-10, resolution[1]-60)
+        elif tosend == 'sa' and lastsent != tosend:
+            directionfigure = (pygame.transform.rotate(arrow, 225))
+            x_pos, y_pos = (-10, resolution[1]-60)
+        elif tosend == 'sd' and lastsent != tosend:
+            directionfigure = (pygame.transform.rotate(arrow, 315))
+            x_pos, y_pos = (-10, resolution[1]-60)
+        elif tosend == 'stop' and lastsent != tosend:
+            directionfigure = box
         # Check move and stop for flags
         # If none are true, no new inputs are detected and
         # thus we stop the robot
         if move == False and stopped == False and connected:
+            tosend = 'stop'
             if connected:
-                server.send('stop')
+                server.send(tosend)
             stopped = True
             lastsent = 'stop'
             logging.debug(lastsent)
-            arrow = screen.set_alpha(0) ## needs fix
+            directionfigure = box
+            #arrow = screen.set_alpha(0) ## needs fix
         elif move == True and connected and lastsent != tosend:
             server.send(tosend)
             lastsent = tosend
             logging.debug(lastsent)
+        elif move == False  and stopped == False:
+            directionfigure = box
+            tosend = 'stop'
+            stopped = True
+            lastsent = tosend
+            logging.debug(lastsent)
+            print('yo mom a hoho')
+        elif move == True and lastsent != tosend:
+            lastsent = tosend
+            logging.debug(lastsent)
+            
 
         # If connected, fill the background with the videostream
         # If not, just fill it with black
@@ -287,13 +322,17 @@ def rungame(queue: Queue, event: Event) -> None:
         if text_input_box.active:
             group.draw(screen)
 
-        screen.blit(arrow, (0,resolution[1]-50))
+        screen.blit(directionfigure, (x_pos,y_pos))
         # Update the screen and set framerate
         
         textRect.bottomright = (resolution[0]-10, resolution[1]-10)
         screen.blit(text,textRect)
         pygame.display.update()
+        
+        
         clock.tick(15)
+        
+        
 
     # Send warningflags to stop the server and client.
     # After this has been done, close the game properly.
