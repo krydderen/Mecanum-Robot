@@ -21,6 +21,7 @@ from queue import Queue
 from typing import NoReturn
 from pygame.constants import RESIZABLE
 import pygame_gui
+import os
 
 # Importing utils
 from utils.server import Server
@@ -95,8 +96,14 @@ def rungame(queue: Queue, event: Event) -> None:
     text = font.render(f'SPEED: {speed}', True, (255, 255, 255), None)
     textRect = text.get_rect()
     
-    arrow = pygame.image.load('red_arrow.png')
+    if os.path.exists('\mecanum\Mecanum-Robot'):
+        # Change the current working Directory    
+        os.chdir('\mecanum\Mecanum-Robot')
+    else:
+        print("Can't change the Current Working Directory")
 
+    arrow = pygame.transform.smoothscale(pygame.image.load('red_arrow.png'),
+    (50,50))
 
     while run:
         # -----------------------------------------------
@@ -139,7 +146,7 @@ def rungame(queue: Queue, event: Event) -> None:
                 
         # Check for any joystick inputs
         try:
-            buttons = [] 
+            buttons = [None] * 4
             joystick = pygame.joystick.Joystick(0)
             joystick.init()
             stick_L = (joystick.get_axis(0), joystick.get_axis(1))
@@ -212,6 +219,7 @@ def rungame(queue: Queue, event: Event) -> None:
                 stick_L[0] < - deadzone):
             move = True
             stopped = False
+            arrow = (pygame.transform.rotate(arrow, 180), (0,resolution[1]-50))
             x -= vel
             tosend = 'a'
         # Flag for going right/east
@@ -219,15 +227,16 @@ def rungame(queue: Queue, event: Event) -> None:
                 stick_L[0] > deadzone):
             move = True
             stopped = False
+            arrow = (pygame.transform.rotate(arrow, 0), (0,resolution[1]-50))
             x += vel
             tosend = 'd'
         # Flag for rotating counterclockwise
-        elif keys[pygame.K_q] or button1:
+        elif keys[pygame.K_q] or buttons[2]:
             move = True
             stopped = False
             tosend = 'q'
         # Flag for rotating clockwise
-        elif keys[pygame.K_e] or button2:
+        elif keys[pygame.K_e] or buttons[3]:
             move = True
             stopped = False
             tosend = 'e'
@@ -259,6 +268,7 @@ def rungame(queue: Queue, event: Event) -> None:
             stopped = True
             lastsent = 'stop'
             logging.debug(lastsent)
+            arrow = screen.set_alpha(0) ## needs fix
         elif move == True and connected and lastsent != tosend:
             server.send(tosend)
             lastsent = tosend
@@ -276,6 +286,8 @@ def rungame(queue: Queue, event: Event) -> None:
         pygame.draw.rect(screen, (255, 0, 0), (x, y, width, height))
         if text_input_box.active:
             group.draw(screen)
+
+        screen.blit(arrow, (0,resolution[1]-50))
         # Update the screen and set framerate
         
         textRect.bottomright = (resolution[0]-10, resolution[1]-10)
@@ -313,4 +325,3 @@ if __name__ == '__main__':
     
     thread1.join()
     thread2.join()
-    
