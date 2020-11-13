@@ -80,8 +80,12 @@ def rungame(queue: Queue, event: Event) -> None:
     connected: bool = False
     tosend: str = ''
     lastsent:str = ''
-    
 
+    if os.path.exists('\mecanum\Mecanum-Robot'):
+        # Change the current working Directory
+        os.chdir('\mecanum\Mecanum-Robot')
+    else:
+        print("Can't change the Current Working Directory")
 
     screen = pygame.display.set_mode(resolution, pygame.RESIZABLE)
     pygame.display.set_caption("brom brom")
@@ -91,22 +95,16 @@ def rungame(queue: Queue, event: Event) -> None:
     font = pygame.font.SysFont(None, 50)
     text_input_box = TextInputBox(10, 10, 50, font)
     group = pygame.sprite.Group(text_input_box)
-    direction_pos = (0, resolution[1]-50)
+    direction_pos = (25, resolution[1]-25)
     arrow = pygame.transform.smoothscale(pygame.image.load('red_arrow.png'), (50,50))
-    arrowrect = arrow.get_rect()
-    arrowrect.x, arrowrect.y = direction_pos
     box = pygame.transform.smoothscale(pygame.image.load('red_square.png'), (50,50))
-    boxrect = box.get_rect()
+    rotating_arrows = pygame.transform.smoothscale(pygame.image.load('rotate_arrow.png'), (50,50))
     directionfigure = box
     
     text = font.render(f'SPEED: {speed}', True, (255, 255, 255), None)
     textRect = text.get_rect()
     
-    if os.path.exists('\mecanum\Mecanum-Robot'):
-        # Change the current working Directory    
-        os.chdir('\mecanum\Mecanum-Robot')
-    else:
-        print("Can't change the Current Working Directory")
+    
 
     while run:
         # -----------------------------------------------
@@ -271,19 +269,23 @@ def rungame(queue: Queue, event: Event) -> None:
         elif tosend == 'd' and lastsent != tosend:
             directionfigure = (pygame.transform.rotate(arrow, 0))
         elif tosend == 'wd' and lastsent != tosend:
-            directionfigure = (pygame.transform.rotate(arrow, 45))
-            x_pos, y_pos = (-10, resolution[1]-60)
+            directionfigure = (pygame.transform.rotate(arrow, 45)) 
         elif tosend == 'wa' and lastsent != tosend:
-            directionfigure = (pygame.transform.rotate(arrow, 125))
-            x_pos, y_pos = (-10, resolution[1]-60)
+            directionfigure = (pygame.transform.rotate(arrow, 135))
         elif tosend == 'sa' and lastsent != tosend:
             directionfigure = (pygame.transform.rotate(arrow, 225))
-            x_pos, y_pos = (-10, resolution[1]-60)
         elif tosend == 'sd' and lastsent != tosend:
             directionfigure = (pygame.transform.rotate(arrow, 315))
-            x_pos, y_pos = (-10, resolution[1]-60)
+        elif tosend == 'q' and lastsent != tosend:
+            directionfigure = rotating_arrows
+        elif tosend == 'e' and lastsent != tosend:
+            directionfigure = (pygame.transform.flip(rotating_arrows, True, False))
         elif tosend == 'stop' and lastsent != tosend:
             directionfigure = box
+        
+        dir_rect = directionfigure.get_rect()
+        dir_rect.center = direction_pos
+
         # Check move and stop for flags
         # If none are true, no new inputs are detected and
         # thus we stop the robot
@@ -325,7 +327,7 @@ def rungame(queue: Queue, event: Event) -> None:
         if text_input_box.active:
             group.draw(screen)
 
-        screen.blit(directionfigure, direction_pos)
+        screen.blit(directionfigure, dir_rect)
         # Update the screen and set framerate
         
         textRect.bottomright = (resolution[0]-10, resolution[1]-10)
