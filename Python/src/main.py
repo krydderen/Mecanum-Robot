@@ -20,7 +20,7 @@ from threading import Event
 from queue import Queue
 from typing import NoReturn
 from pygame.constants import RESIZABLE
-import pygame_gui
+import os
 
 # Importing utils
 from utils.server import Server
@@ -69,7 +69,9 @@ def rungame(queue: Queue, event: Event) -> None:
     width: int = 40
     height: int = 60
     speed: int = 100
+    newspeed: int = 0
     drive_time: int = 0.2
+    currentspeed: int = 0
     deadzone : float = 0.5
     stick_L: tuple = (0, 0)
     resolution: tuple = (640, 480)
@@ -80,8 +82,12 @@ def rungame(queue: Queue, event: Event) -> None:
     connected: bool = False
     tosend: str = ''
     lastsent:str = ''
-    
 
+    if os.path.exists('\mecanum\Mecanum-Robot'):
+        # Change the current working Directory
+        os.chdir('\mecanum\Mecanum-Robot')
+    else:
+        print("Can't change the Current Working Directory")
 
     screen = pygame.display.set_mode(resolution, pygame.RESIZABLE)
     pygame.display.set_caption("brom brom")
@@ -91,18 +97,22 @@ def rungame(queue: Queue, event: Event) -> None:
     font = pygame.font.SysFont(None, 50)
     text_input_box = TextInputBox(10, 10, 50, font)
     group = pygame.sprite.Group(text_input_box)
+    direction_pos = (25, resolution[1]-25)
+    arrow = pygame.transform.smoothscale(pygame.image.load('red_arrow.png'), (50,50))
+    box = pygame.transform.smoothscale(pygame.image.load('red_square.png'), (50,50))
+    rotating_arrows = pygame.transform.smoothscale(pygame.image.load('rotate_arrow.png'), (50,50))
+    directionfigure = box
     
-    text = font.render(f'SPEED: {speed}', True, (255, 255, 255), None)
+    text = font.render(f'SPEED: 100', True, (255, 255, 255), None)
     textRect = text.get_rect()
     
-    arrow = pygame.image.load('red_arrow.png')
-
+    
 
     while run:
         # -----------------------------------------------
         # ---------Check if connection is active---------
         connected = server.isconnected()
-
+        
         # pygame.time.delay(50)
 
         # Get the current events happening on screen
@@ -123,10 +133,11 @@ def rungame(queue: Queue, event: Event) -> None:
                         text_input_box.active = False
                         print(f"final text {text_input_box.text}")
                         try:
-                            speed = int(text_input_box.text)
-                            text = font.render(f'SPEED: {speed}', True, (255, 255, 255), None)
-                            if connected:
-                                server.send(['speed', speed])
+                            newspeed = int(text_input_box.text)
+                            text = font.render(f'SPEED: {newspeed}', True, (255, 255, 255), None)
+                            if connected and currentspeed != newspeed:
+                                server.send(['speed', newspeed])
+                                currentspeed = newspeed
                         except:
                             pass
                         text_input_box.text = ''
@@ -139,7 +150,7 @@ def rungame(queue: Queue, event: Event) -> None:
                 
         # Check for any joystick inputs
         try:
-            buttons = [] 
+            buttons = [None] * 4
             joystick = pygame.joystick.Joystick(0)
             joystick.init()
             stick_L = (joystick.get_axis(0), joystick.get_axis(1))
@@ -222,12 +233,12 @@ def rungame(queue: Queue, event: Event) -> None:
             x += vel
             tosend = 'd'
         # Flag for rotating counterclockwise
-        elif keys[pygame.K_q] or button1:
+        elif keys[pygame.K_q] or buttons[2]:
             move = True
             stopped = False
             tosend = 'q'
         # Flag for rotating clockwise
-        elif keys[pygame.K_e] or button2:
+        elif keys[pygame.K_e] or buttons[3]:
             move = True
             stopped = False
             tosend = 'e'
@@ -238,31 +249,72 @@ def rungame(queue: Queue, event: Event) -> None:
         if buttons[0] and buttons[1]:
             logging.debug('+1 -1 speed')
         elif buttons[1]:
-            speed -= 1
-            if speed <= 0:
-                speed = 100
+            newspeed -= 1
+            if newspeed <= 0:
+                newspeed = 100
         elif buttons[0]:
-            speed += 1
-            if speed >= 100:
-                speed = 100
+            newspeed += 1
+            if newspeed >= 100:
+                newspeed = 100
                         
-        if connected and (pygame.joystick.get_count > 0):
-            msg = ['speed', speed]
+        if connected and (pygame.joystick.get_count != 0) and currentspeed != newspeed:
+            msg = ['speed', newspeed]
             server.send(msg)
+            currentspeed = newspeed
+            
+        if tosend == 'w' and lastsent != tosend:
+            directionfigure = (pygame.transform.rotate(arrow, 90))
+        elif tosend == 'a' and lastsent != tosend:
+            directionfigure = (pygame.transform.rotate(arrow, 180))
+        elif tosend == 's' and lastsent != tosend:
+            directionfigure = (pygame.transform.rotate(arrow, 270))
+        elif tosend == 'd' and lastsent != tosend:
+            directionfigure = (pygame.transform.rotate(arrow, 0))
+        elif tosend == 'wd' and lastsent != tosend:
+            directionfigure = (pygame.transform.rotate(arrow, 45)) 
+        elif tosend == 'wa' and lastsent != tosend:
+            directionfigure = (pygame.transform.rotate(arrow, 135))
+        elif tosend == 'sa' and lastsent != tosend:
+            directionfigure = (pygame.transform.rotate(arrow, 225))
+        elif tosend == 'sd' and lastsent != tosend:
+            directionfigure = (pygame.transform.rotate(arrow, 315))
+        elif tosend == 'q' and lastsent != tosend:
+            directionfigure = rotating_arrows
+        elif tosend == 'e' and lastsent != tosend:
+            directionfigure = (pygame.transform.flip(rotating_arrows, True, False))
+        elif tosend == 'stop' and lastsent != tosend:
+            directionfigure = box
+        
+        dir_rect = directionfigure.get_rect()
+        dir_rect.center = direction_pos
 
         # Check move and stop for flags
         # If none are true, no new inputs are detected and
         # thus we stop the robot
         if move == False and stopped == False and connected:
+            tosend = 'stop'
             if connected:
-                server.send('stop')
+                server.send(tosend)
             stopped = True
             lastsent = 'stop'
             logging.debug(lastsent)
+            directionfigure = box
+            #arrow = screen.set_alpha(0) ## needs fix
         elif move == True and connected and lastsent != tosend:
             server.send(tosend)
             lastsent = tosend
             logging.debug(lastsent)
+        elif move == False  and stopped == False:
+            directionfigure = box
+            tosend = 'stop'
+            stopped = True
+            lastsent = tosend
+            logging.debug(lastsent)
+            print('yo mom a hoho')
+        elif move == True and lastsent != tosend:
+            lastsent = tosend
+            logging.debug(lastsent)
+            
 
         # If connected, fill the background with the videostream
         # If not, just fill it with black
@@ -273,15 +325,21 @@ def rungame(queue: Queue, event: Event) -> None:
             screen.fill('black')
 
         # Using a little red rectangle for movement visualisation
-        pygame.draw.rect(screen, (255, 0, 0), (x, y, width, height))
+        #pygame.draw.rect(screen, (255, 0, 0), (x, y, width, height))
         if text_input_box.active:
             group.draw(screen)
+
+        screen.blit(directionfigure, dir_rect)
         # Update the screen and set framerate
         
         textRect.bottomright = (resolution[0]-10, resolution[1]-10)
         screen.blit(text,textRect)
         pygame.display.update()
+
+        
         clock.tick(15)
+        
+        
 
     # Send warningflags to stop the server and client.
     # After this has been done, close the game properly.
@@ -313,4 +371,3 @@ if __name__ == '__main__':
     
     thread1.join()
     thread2.join()
-    
