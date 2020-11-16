@@ -69,7 +69,9 @@ def rungame(queue: Queue, event: Event) -> None:
     width: int = 40
     height: int = 60
     speed: int = 100
+    newspeed: int = 0
     drive_time: int = 0.2
+    currentspeed: int = 0
     deadzone : float = 0.5
     stick_L: tuple = (0, 0)
     resolution: tuple = (640, 480)
@@ -101,7 +103,7 @@ def rungame(queue: Queue, event: Event) -> None:
     rotating_arrows = pygame.transform.smoothscale(pygame.image.load('rotate_arrow.png'), (50,50))
     directionfigure = box
     
-    text = font.render(f'SPEED: {speed}', True, (255, 255, 255), None)
+    text = font.render(f'SPEED: 100', True, (255, 255, 255), None)
     textRect = text.get_rect()
     
     
@@ -132,7 +134,7 @@ def rungame(queue: Queue, event: Event) -> None:
                         print(f"final text {text_input_box.text}")
                         try:
                             newspeed = int(text_input_box.text)
-                            text = font.render(f'SPEED: {speed}', True, (255, 255, 255), None)
+                            text = font.render(f'SPEED: {newspeed}', True, (255, 255, 255), None)
                             if connected and currentspeed != newspeed:
                                 server.send(['speed', newspeed])
                                 currentspeed = newspeed
@@ -255,7 +257,7 @@ def rungame(queue: Queue, event: Event) -> None:
             if newspeed >= 100:
                 newspeed = 100
                         
-        if connected and (pygame.joystick.get_count > 0) and currentspeed != newspeed:
+        if connected and (pygame.joystick.get_count != 0) and currentspeed != newspeed:
             msg = ['speed', newspeed]
             server.send(msg)
             currentspeed = newspeed
