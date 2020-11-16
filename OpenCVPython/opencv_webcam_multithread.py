@@ -49,7 +49,7 @@ if __name__ == "__main__":
 
     vs = WebCamVideoStream().start()
     while True:
-        _, frame = vs.read()
+        frame = vs.read()
 
         """
         Start of facial detection
