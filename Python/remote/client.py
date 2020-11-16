@@ -3,7 +3,7 @@
 
 """
 Script for client class and its methods for both 
-sending and recieving frames and user commands.
+sending and receiving frames and user commands.
 
 Reference:
     https://realpython.com/documenting-python-code/
@@ -18,7 +18,7 @@ import logging
 import threading
 import queue
 import cv2
-from roboclaw_3 import Roboclaw
+from utils.roboclaw_3 import Roboclaw
 from time import sleep
 from typing import NoReturn
 
@@ -27,7 +27,7 @@ class Client(object):
     """[summary]
     A class used to represent a client.
     The client will be initialized through ThreadPoolExecutor
-    and runned as daemon. This means that as soon as the job is done, 
+    and run as daemon. This means that as soon as the job is done,
     the thread will terminate itself completely.
     Args:
         object ([type]): Socket Object which acts as an client.
@@ -62,7 +62,7 @@ class Client(object):
     def start(self) -> NoReturn:
         """
         Starts the camera, initializes the socket and connects to it.
-        When done, sets the conenction to true.
+        When done, sets the connection to true.
         """
         self.logger.info("Starting camera...")
         self.logger.debug(f"SERVER - {self.ADDR}")
@@ -213,7 +213,7 @@ class Client(object):
                     # event.set()
                     self.disconnect()
             except Exception as e:
-                logging.debug(f"Exception occured: {e}")
+                logging.debug(f"Exception occurred: {e}")
                 event.set()
 
 
