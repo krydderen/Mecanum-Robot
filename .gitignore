@@ -6,3 +6,5 @@ Python/resources/
 
 
 *.pyc
+
+__pycache__

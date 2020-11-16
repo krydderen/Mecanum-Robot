@@ -59,10 +59,13 @@ def rungame(queue: Queue, event: Event) -> None:
     connected: bool = False
     tosend: str = ''
     lastsent:str = ''
-
-    if os.path.exists('\mecanum\Mecanum-Robot'):
-        # Change the current working Directory
-        os.chdir('\mecanum\Mecanum-Robot')
+    
+    if os.path.exists(r"python\src\utils\img"):
+        # Change the current working Directory - Kev
+        os.chdir(r"python\src\utils\img")
+    elif os.path.exists(r'\mecanum\Mecanum-Robot'):
+        # Change the current working Directory - Rub
+        os.chdir(r'\mecanum\Mecanum-Robot')
     else:
         print("Can't change the Current Working Directory")
 
