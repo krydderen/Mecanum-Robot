@@ -6,7 +6,8 @@ from numpy.core.numeric import cross
 from tqdm import tqdm_notebook
 import matplotlib.pyplot as plt
 
-# TODO make it so the code is a class, then implement it into the main program for the robot!
+# TODO implement it into the main program for the robot!
+# TODO It should override the user input to avoid collisions with objects
 
 
 class obstacleDetection:
