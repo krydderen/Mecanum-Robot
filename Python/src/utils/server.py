@@ -25,6 +25,7 @@ import sys
 import logging
 import numpy
 import pygame
+import numpy as np
 from typing import NoReturn
 
 # Initialize custom exception class
@@ -65,7 +66,7 @@ class Server(object):
         self.conn = ''
         self.addr = ''
         self.frame = None
-        self.canny = None
+        self.canny = np.array([0])
         self.stop = False
 
     def stop(self):
@@ -93,7 +94,7 @@ class Server(object):
             Returns:
                 any: The formatted frame.
             """
-            if self.canny != None:
+            if self.canny.any():
                 return self.canny
             else:
                 return
