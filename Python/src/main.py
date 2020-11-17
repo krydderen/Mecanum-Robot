@@ -21,6 +21,7 @@ from queue import Queue
 from typing import NoReturn
 from pygame.constants import RESIZABLE
 import os
+import cv2
 
 # Importing utils
 from utils.server import Server
@@ -299,7 +300,11 @@ def rungame(queue: Queue, event: Event) -> None:
         # If not, just fill it with black
         frame = server.get_frame(resolution)
         canny = server.get_canny()
-        if connected:
+        if connected: 
+            try:
+                cv2.imshow("canny", canny)
+            except:
+                pass
             obsdet.set_canny(canny)
         
         if connected and frame != None:
@@ -347,13 +352,13 @@ if __name__ == '__main__':
     
     thread1 = threading.Thread(target=rungame, args=(queue, event))
     thread2 = threading.Thread(target=server.start, args=(queue, event))
-    thread3 = threading.Thread(target=obsdet.start, args=(queue, event))
+    # thread3 = threading.Thread(target=obsdet.start, args=(queue, event))
     
     thread1.start()
     thread2.start()
-    thread3.start()
+    # thread3.start()
     
     thread1.join()
     thread2.join()
-    thread3.join()
+    # thread3.join()
     

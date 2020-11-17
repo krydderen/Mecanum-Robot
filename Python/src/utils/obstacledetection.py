@@ -54,28 +54,36 @@ class ObstacleDetection:
     def start(self, queue: Queue, event: Event):
         resolution = (256, 144)
         percent = 1.2
+        sleep(2)
         while not event.is_set():
-            sleep(1)
-            if self.canny.any() > 0:
+            cv2.waitKey(50)
+            if self.canny.any() > 0 or self.canny != None:
                 cropped_image = self.region_of_interest(self.canny, resolution, percent)
                 cropped_image2 = self.region_of_interest2(self.canny, resolution, percent)
                 combo_image = cropped_image + cropped_image2
                 
                 # cv2.imshow("Feed", self.canny)
-                # cv2.imshow("ROI", combo_image)
+                try:
+                    cv2.imshow("ROI", combo_image)
+                except:
+                    pass
                 
                 # Checking activity in the roi's
                 if self.check_roi(cropped_image) and self.check_roi(cropped_image2):
-                    print('Back up bitch')
+                    print('Back up')
+                    pass
                     # TODO call on the commands of the controller to turn around 90 degrees
                 elif self.check_roi(cropped_image):
-                    print('On you left')
+                    print('left')
+                    pass
                     # TODO Turn about 45 degrees to the right
                 elif self.check_roi(cropped_image2):
-                    print('Spin me right round baby')
+                    print('right')
+                    pass
                     # TODO Turn about 45 degrees to the left
                 else:
-                    print('Dont you say it')
+                    print('nothing')
+                    pass
                     # TODO Nothing detected, do nothing
 
 

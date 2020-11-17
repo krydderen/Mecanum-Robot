@@ -97,7 +97,7 @@ class Server(object):
             if self.canny.any():
                 return self.canny
             else:
-                return
+                return np.array([0])
     def get_frame(self, resolution) -> any:
         """
         Transforms the frame to suit the format
@@ -153,18 +153,23 @@ class Server(object):
                         data += self.conn.recv(self.HEADER)
                     frame_data = data[:msg_size]
                     data = data[msg_size:]
-                    frame = pickle.loads(frame_data)
-                    frame = cv2.flip(frame, 0)
+                    pickledframe = pickle.loads(frame_data)
+                    frame = cv2.flip(pickledframe, 0)
                     frame = cv2.flip(frame, 1)
                     frame = numpy.rot90(frame)
                     frame = frame[::-1]
                     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                    blur  = cv2.GaussianBlur(frame, (5,5),1)
-                    canny = cv2.Canny(blur,50,150)
                     frame = pygame.surfarray.make_surface(frame)
+                    
+                    canny = cv2.flip(pickledframe, 0)
+                    canny = cv2.flip(canny, 1)
+                    # canny = numpy.rot90(canny)
+                    canny = cv2.cvtColor(canny, cv2.COLOR_BGR2RGB)
+                    blur  = cv2.GaussianBlur(canny, (5,5),1)
+                    canny = cv2.Canny(blur,50,150)
+                    
                     self.canny = canny
                     self.frame = frame
-                    
             except socket.timeout:
                 print("deadlmao")
                 event.set()
