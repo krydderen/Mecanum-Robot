@@ -48,6 +48,7 @@ def rungame(queue: Queue, event: Event) -> None:
     width: int = 40
     height: int = 60
     speed: int = 100
+    diagsens: int = 0.3
     newspeed: int = 0
     drive_time: int = 0.2
     currentspeed: int = 0
@@ -138,6 +139,8 @@ def rungame(queue: Queue, event: Event) -> None:
             buttons.insert(1,joystick.get_button(3))
             buttons.insert(2,joystick.get_button(4))
             buttons.insert(3,joystick.get_button(5))
+            buttons.insert(4,joystick.get_button(0))
+            buttons.insert(5,joystick.get_button(1))
         except:
             pass
 
@@ -151,7 +154,7 @@ def rungame(queue: Queue, event: Event) -> None:
         # Flag for going northeast
         if ((keys[pygame.K_w] and keys[pygame.K_d]) or (
             keys[pygame.K_UP] and keys[pygame.K_RIGHT]) or
-                stick_L[0] > deadzone and stick_L[1] < -deadzone):
+                stick_L[0] > diagsens and stick_L[1] < -diagsens):
             move = True
             stopped = False
             y -= vel
@@ -160,7 +163,7 @@ def rungame(queue: Queue, event: Event) -> None:
         # Flag for going northwest
         elif ((keys[pygame.K_w] and keys[pygame.K_a]) or (
                 keys[pygame.K_UP] and keys[pygame.K_LEFT]) or
-                stick_L[0] < -deadzone and stick_L[1] < -deadzone):
+                stick_L[0] < -diagsens and stick_L[1] < -diagsens):
             move = True
             stopped = False
             y -= vel
@@ -169,7 +172,7 @@ def rungame(queue: Queue, event: Event) -> None:
         # Flag for going southeast
         elif ((keys[pygame.K_s] and keys[pygame.K_d]) or (
                 keys[pygame.K_DOWN] and keys[pygame.K_RIGHT]) or
-                stick_L[0] > deadzone and stick_L[1] > deadzone):
+                stick_L[0] > diagsens and stick_L[1] > diagsens):
             move = True
             stopped = False
             y += vel
@@ -178,7 +181,7 @@ def rungame(queue: Queue, event: Event) -> None:
         # Flag for going southwest
         elif ((keys[pygame.K_s] and keys[pygame.K_a]) or (
                 keys[pygame.K_DOWN] and keys[pygame.K_LEFT]) or
-                stick_L[0] < -deadzone and stick_L[1] > deadzone):
+                stick_L[0] < -diagsens and stick_L[1] > diagsens):
             move = True
             stopped = False
             y += vel
@@ -228,14 +231,29 @@ def rungame(queue: Queue, event: Event) -> None:
         # Speedselection using controller
         if buttons[0] and buttons[1]:
             logging.debug('+1 -1 speed')
-        elif buttons[1]:
-            newspeed -= 1
-            if newspeed <= 0:
-                newspeed = 100
         elif buttons[0]:
-            newspeed += 1
+            if newspeed == 69:
+                newspeed = 70
+            newspeed -= 5
+            if newspeed <= 0:
+                newspeed = 0
+            text = font.render(f'SPEED: {newspeed}', True, (255, 255, 255), None)
+        elif buttons[1]:
+            if newspeed == 69:
+                newspeed = 70
+            newspeed += 5
             if newspeed >= 100:
                 newspeed = 100
+            text = font.render(f'SPEED: {newspeed}', True, (255, 255, 255), None)
+        elif buttons[4]:
+            #A
+            pass
+        elif buttons[5]:
+            #B
+            newspeed = 69
+            text = font.render(f'sped69:lmao', True, (255, 255, 255), None)
+        
+        
                         
         if connected and (pygame.joystick.get_count != 0) and currentspeed != newspeed:
             msg = ['speed', newspeed]
@@ -301,10 +319,10 @@ def rungame(queue: Queue, event: Event) -> None:
         frame = server.get_frame(resolution)
         canny = server.get_canny()
         if connected: 
-            try:
-                cv2.imshow("canny", canny)
-            except:
-                pass
+            # try:
+                # cv2.imshow("canny", canny)
+            # except:
+            #     pass
             obsdet.set_canny(canny)
         
         if connected and frame != None:
