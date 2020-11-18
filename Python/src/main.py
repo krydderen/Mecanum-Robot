@@ -48,7 +48,7 @@ def rungame(queue: Queue, event: Event) -> None:
     width: int = 40
     height: int = 60
     speed: int = 100
-    diagsens: int = 0.3
+    diagsens: float = 0.3
     newspeed: int = 0
     drive_time: int = 0.2
     currentspeed: int = 0
@@ -131,7 +131,7 @@ def rungame(queue: Queue, event: Event) -> None:
                 
         # Check for any joystick inputs
         try:
-            buttons = [None] * 4
+            buttons = [None] * 6 
             joystick = pygame.joystick.Joystick(0)
             joystick.init()
             stick_L = (joystick.get_axis(0), joystick.get_axis(1))
@@ -308,7 +308,7 @@ def rungame(queue: Queue, event: Event) -> None:
             stopped = True
             lastsent = tosend
             logging.debug(lastsent)
-            print('yo mom a hoho')
+            # print('yo mom a hoho')
         elif move == True and lastsent != tosend:
             lastsent = tosend
             logging.debug(lastsent)
