@@ -20,3 +20,15 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 The source of this project was to make a multi-threaded code within Python. This was created with the idea of using it to manoeuvre a Mecanum vehicle that would be able to see and detect obstacles. Initially, we wished to have a scanning system that would round around any object and scan them, giving the user a 3D model of said object. Due to deadline and knowledge, we had to cut that out of the project plan and focus on threading within Python, which was a success.
+
+## Built With
+
+* [Python](https://www.python.org/) - Python
+
+## Authors
+
+* **Kevin M. Storvik** - [krydderen](https://github.com/krydderen)
+
+* **Ruben Aakervik** - [Rubho](https://github.com/Rubho)
+
+* **Peter H. Osnes** - [ComradePetah](https://github.com/ComradePetah)
