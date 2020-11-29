@@ -11,7 +11,7 @@
   <p align="center">
     Creating and operating a Multi-threaded Mecanum Robot.
     <br />
-    <a href="https://github.com/github_username/repo_name">Explore the report</a>
+    <a href="https://github.com/krydderen/Mecanum-Robot/blob/master/resources/Report.pdf">Explore the report</a>
     •
     <a href="https://www.youtube.com/watch?v=8pF0-m0eWi0">View Demo</a>
   </p>
