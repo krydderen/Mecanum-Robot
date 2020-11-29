@@ -84,20 +84,20 @@ class Server(object):
         self.connected = False
         
     def get_canny(self) -> any:
-            """
-            Transforms the frame to suit the format
-            of the GUI.
-            Args:
-                resolution (tuple): The set resolution we want
-                the frame to be.
+        """
+        Transforms the frame to suit the format
+        of the GUI.
+        Args:
+            resolution (tuple): The set resolution we want
+            the frame to be.
 
-            Returns:
-                any: The formatted frame.
-            """
-            if self.canny.any():
-                return self.canny
-            else:
-                return np.array([0])
+        Returns:
+            any: The formatted frame.
+        """
+        if self.canny.any():
+            return self.canny
+        else:
+            return np.array([0])
     def get_frame(self, resolution) -> any:
         """
         Transforms the frame to suit the format
